@@ -1,0 +1,112 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  height: 100%;
+  max-width: 600px;
+  min-width: 600px;
+  color: black;
+}
+
+.tabbedContainer {
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-right: 10px;
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+.tabList {
+  display: flex;
+  justify-content: space-around;
+  list-style: none;
+  margin-top: 30px;
+  padding: 0;
+}
+
+.tabcont {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 2px;
+  background-color: #f0f8f6;
+}
+
+.tab {
+  text-align: center;
+  padding: 2px;
+  width: 180px;
+  cursor: pointer;
+  color: #979595;
+  transition: background-color 0.2s ease-in-out;
+  font-weight: bold;
+}
+
+.activeTab {
+  background-color: #575c5b;
+  text-align: center;
+  padding: 2px;
+  cursor: pointer;
+  color: #444;
+  transition: background-color 0.2s ease-in-out;
+  border-radius: 3px;
+  width: 180px;
+  color: white;
+  font-weight: bold;
+}
+
+.tabPanel {
+  padding: 20px;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.errorcontainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 400px;
+}
+
+.errorimg {
+  margin-top: 250px;
+  margin-bottom: 20px;
+  width: 510px;
+  height: 100px;
+}
+
+.errortext {
+  font-family: Ubuntu-Medium, Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  color: #008aa8;
+}
+
+.reload {
+  font-family: Ubuntu-Medium, Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  color: #01232b;
+  cursor: pointer;
+  margin-top: 5px;
+  margin-bottom: 250px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  padding-top: 350px;
+  padding-bottom: 400px;
+  padding-left: 20px;
+}

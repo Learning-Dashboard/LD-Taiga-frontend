@@ -1,0 +1,39 @@
+h1 {
+  font-family: Ubuntu-Medium, Arial, Helvetica, sans-serif;
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: #008aa8;
+  -webkit-margin-after: 1rem;
+  margin-block-end: 1rem;
+}
+
+.containerMetrics {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  min-width: 600px;
+}
+
+.containerLogInMessage {
+  display: flex;
+  max-width: 400px;
+  min-width: 400px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-right: 100px;
+  padding-left: 50px;
+}
+
+.logInMessage {
+  display: flex;
+  padding: 10px;
+  max-width: 400px;
+  min-width: 400px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  align-self: center;
+  padding-top: 300px;
+  padding-bottom: 400px;
+}

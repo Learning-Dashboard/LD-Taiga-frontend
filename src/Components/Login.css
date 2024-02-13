@@ -1,0 +1,114 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.button {
+  border: none;
+  border-radius: 1px;
+  width: 60%;
+  padding: 20px 15px;
+  background-color: #007aff;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin: 20px 0;
+
+  &:hover,
+  &:focus {
+    box-shadow: 0px 3px 20px 3px rgba(#007aff, 0.3);
+    background-color: #007aff;
+  }
+}
+
+.title {
+  text-transform: capitalize;
+  font-size: 1.6em;
+  font-weight: 300;
+  padding: 60px 0;
+  padding-bottom: 10px;
+}
+.user {
+  margin: 20px;
+}
+
+.pswd {
+  margin: 20px;
+  padding-left: 4px;
+}
+
+.pswd-input {
+  margin: 5px;
+  border-radius: 1px;
+  border-color: black;
+  border-width: 1px;
+  padding-left: 5px;
+  border-radius: 5px;
+  margin-left: 5px;
+}
+
+.user-input {
+  margin: 5px;
+  margin-left: 5px;
+  border-radius: 1px;
+  border-color: black;
+  border-width: 1px;
+  padding-left: 5px;
+  border-radius: 5px;
+}
+
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.logged-container {
+  padding-top: 15%;
+}
+
+.pp {
+  margin-bottom: 20px;
+}
+
+.img {
+  height: 100px;
+  width: auto;
+}
+
+.bar {
+  position: absolute;
+  top: 0%;
+
+  height: 40px;
+  width: 100%;
+  background-color: #007aff;
+}
+
+.about {
+  color: blue;
+  text-decoration: underline;
+  padding-top: 20px;
+}
+
+.about-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Este alinea los items al inicio */
+  justify-content: flex-start; /* Este alinea el contenido al inicio */
+  height: 100%;
+  width: 100%;
+}
+
+.back {
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.text-about {
+  margin: 20px;
+}
