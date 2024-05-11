@@ -34,7 +34,7 @@ const Login = () => {
     // Aquí llamarías a tu backend para autenticar al usuario
     // Si el usuario es autenticado con éxito, establecerías isLoggedIn a true
     try {
-      const response = await fetch('https://proxy-tfg.vercel.app/api/login', {
+      const response = await fetch('http://localhost:3000/api/login', {
         method: 'POST',
         body: JSON.stringify({ username, password }),
         headers: {
@@ -141,7 +141,7 @@ const Login = () => {
                 <p>
                   For more information and access to the source code, visit:
                 </p>
-                <a href="https://github.com/gerardalvarez/Taiga_metrics-extension">
+                <a href="https://github.com/Learning-Dashboard/LD-metrics-extension">
                   GitHub repository
                 </a>
                 <p>To see the complete metrics, visit:</p>

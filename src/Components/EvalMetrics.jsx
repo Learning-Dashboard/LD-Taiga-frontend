@@ -122,7 +122,7 @@ const EvalMetrics = (props) => {
   const handleClick = () => {
     setLoading(true);
     fetch(
-      `https://proxy-tfg.vercel.app/api/projects/${proj}/evaluate/projectmetrics`
+      `http://localhost:3000/api/projects/${proj}/evaluate/projectmetrics`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -154,7 +154,7 @@ const EvalMetrics = (props) => {
         <RadarChart dataset={dataset} />
         <br />
       </div>
-      <div className={styles.container2}>
+      {/* todo<div className={styles.container2}>
         <button
           className={
             !report
@@ -194,7 +194,7 @@ const EvalMetrics = (props) => {
               <br />
             </div>
           ) : null)}
-      </div>
+      </div> */}
     </div>
   );
 };

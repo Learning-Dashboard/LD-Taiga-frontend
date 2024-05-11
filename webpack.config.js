@@ -36,7 +36,7 @@ if (fileSystem.existsSync(secretsPath)) {
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 var options = {
-  mode: "process.env.NODE_ENV || 'development'",
+  mode: process.env.NODE_ENV || "development",
   entry: {
     newtab: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.jsx'),
     options: path.join(__dirname, 'src', 'pages', 'Options', 'index.jsx'),
@@ -45,7 +45,7 @@ var options = {
     contentScript: path.join(__dirname, 'src', 'pages', 'Content', 'index.js'),
     devtools: path.join(__dirname, 'src', 'pages', 'Devtools', 'index.js'),
     panel: path.join(__dirname, 'src', 'pages', 'Panel', 'index.jsx'),
-    taigaContent: './src/pages/Taiga/index.jsx',
+    taigaContent: path.join(__dirname, 'src', 'pages', 'Taiga', 'index.jsx') 
   },
   chromeExtensionBoilerplate: {
     notHotReload: ['background', 'contentScript', 'devtools', 'taigaContent'],

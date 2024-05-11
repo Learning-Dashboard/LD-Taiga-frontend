@@ -34,9 +34,32 @@ const colorBorder = [
 ];
 
 function extractvalues(data) {
+  extractValues(data);
+  doNothing()
   var result = [];
   data.map((dato) => result.push(dato.value * 100));
   return result;
+}
+
+function doNothing() {
+  console.log("do nothin");
+}
+
+function extractValues(data) {
+  
+  console.log("extractValues: ", data);
+
+  //Get the max value of the array to do the chart with %
+  let max = 0;
+  data.forEach(element => {
+    if (element.value*100 > max) {
+      max = element*100;
+    }
+  });
+  console.log("max: ", max);
+
+  const result = data.map((val) => {return ((val.value*100)/max)*100})
+  console.log("result values: ", result);
 }
 
 export default function UserMetrics(props) {
@@ -149,11 +172,10 @@ export default function UserMetrics(props) {
         transition={{ layout: { duration: 0.2 } }}
         layout
       >
-        <motion.div className={styles.buttons_container} layout="position">
+        <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
           <div className={styles.filtername}>Filters</div>
           <div
-            className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
-            onClick={handleClick}
+            className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`} 
           >
             <TbAdjustments size={20} />
           </div>
@@ -253,10 +275,8 @@ export default function UserMetrics(props) {
         </div>
       ) : (
         <div
-          styles={{
-            display: 'flex',
-            justifyContent: 'center',
-          }}
+          className={styles.speedometers_grid}
+          data='angel'
         >
           {Object.keys(dataMetrics).map((key) => {
             if (
@@ -265,13 +285,13 @@ export default function UserMetrics(props) {
             ) {
               return (
                 <>
-                  <hr style={{ width: '500px' }} />
-                  <br />
+                  {/* <hr style={{ width: '500px' }} />
+                  <br /> */}
 
                   <div className={styles.speedometers_container}>
-                    <div className={styles.titulo}>
+                    {/* <div className={styles.titulo}>
                       <div className={styles.infoTit}>{key} </div>
-                    </div>
+                    </div> */}
                     {dataMetrics[key].map((dato) => (
                       <>
                         {(selectedFilters.includes(
