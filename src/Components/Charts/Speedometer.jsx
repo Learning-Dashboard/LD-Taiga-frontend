@@ -3,9 +3,6 @@ import ReactSpeedometer from 'react-d3-speedometer';
 
 function Speedometer(props) {
   
-  console.log("value: ", props.value);
-  console.log("Myyyy spedometer: ", );
-
   return (
     <ReactSpeedometer
       width={250}

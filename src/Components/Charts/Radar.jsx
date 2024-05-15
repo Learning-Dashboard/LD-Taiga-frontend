@@ -19,10 +19,6 @@ ChartJS.register(
   Legend
 );
 
-//StrategicIndicators
-//QualityFactors
-//Bug en el usermetircs
-
 const RadarChart = (props) => {
   console.log("dataset chart: ", props.dataset);
   const datachart = {

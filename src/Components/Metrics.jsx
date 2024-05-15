@@ -35,6 +35,11 @@ export default function Metrics(props) {
         : setActiveTab(data.extensionTabs);
     });
     fetch(
+      `http://localhost:3000/api/projects/${props.proyecto}/strategic_indicators` 
+    )
+      .then((response) => response.json())
+      .then((data) => console.log("strategic: ", data))
+    fetch(
       `http://localhost:3000/api/projects/${props.proyecto}/metricscategories`
     )
       .then((response) => response.json())
