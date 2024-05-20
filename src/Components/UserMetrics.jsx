@@ -276,7 +276,6 @@ export default function UserMetrics(props) {
       ) : (
         <div
           className={styles.speedometers_grid}
-          data='angel'
         >
           {Object.keys(dataMetrics).map((key) => {
             if (

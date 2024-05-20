@@ -68,11 +68,11 @@ export default function ProjectMetrics(props) {
         transition={{ layout: { duration: 0.2 } }}
         layout
       >
-        <motion.div className={styles.buttons_container} layout="position">
+        <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
           <div className={styles.filtername}>Filters</div>
           <div
             className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
-            onClick={handleClick}
+            
           >
             <TbAdjustments size={20} />
           </div>
