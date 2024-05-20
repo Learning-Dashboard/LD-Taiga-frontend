@@ -5,6 +5,7 @@ import UserMetrics from './UserMetrics';
 import ProjectMetrics from './ProjectMetrics';
 import EvalMetrics from './EvalMetrics.jsx';
 import ReactLoading from 'react-loading';
+import StrategicMetrics from './StrategicMetrics.jsx';
 
 function reload() {
   chrome.runtime.sendMessage({
@@ -20,6 +21,7 @@ export default function Metrics(props) {
   const [hours, setHours] = useState(null);
   const [activeTab, setActiveTab] = useState(0); // estado de la pestaña activa
   const [categories, setCategories] = useState('');
+  const [strategic, setStrategic] = useState(null);
   const [lastreport, setLastreport] = useState(null);
   const [report, setReport] = useState(null);
 
@@ -38,7 +40,10 @@ export default function Metrics(props) {
       `http://localhost:3000/api/projects/${props.proyecto}/strategic_indicators` 
     )
       .then((response) => response.json())
-      .then((data) => console.log("strategic: ", data))
+      .then((data) => {
+        setStrategic(data);
+        console.log("strategic: ", data)
+      })
     fetch(
       `http://localhost:3000/api/projects/${props.proyecto}/metricscategories`
     )
@@ -105,54 +110,30 @@ export default function Metrics(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.proyecto]);
 
+
+  const handleSelectChange = (event) => {
+    const selectedTab = parseInt(event.target.value, 10);
+    setActiveTab(selectedTab);
+    chrome.storage.local.set({ extensionTabs: selectedTab }, () => {
+      chrome.runtime.sendMessage({
+        type: 'updateinnerTabs',
+        extensionTabs: selectedTab,
+      });
+    });
+  };
+
   return (
     <>
       <div className={styles.container}>
         <div className={styles.tabbedContainer}>
           <div className={styles.tabList}>
             <div className={styles.tabcont}>
-              <div
-                className={activeTab === 0 ? styles.activeTab : styles.tab}
-                onClick={() => {
-                  setActiveTab(0);
-                  chrome.storage.local.set({ extensionTabs: 0 }, () => {
-                    chrome.runtime.sendMessage({
-                      type: 'updateinnerTabs',
-                      extensionTabs: 0,
-                    });
-                  });
-                }}
-              >
-                Users Metrics
-              </div>
-              <div
-                className={activeTab === 1 ? styles.activeTab : styles.tab}
-                onClick={() => {
-                  setActiveTab(1);
-                  chrome.storage.local.set({ extensionTabs: 1 }, () => {
-                    chrome.runtime.sendMessage({
-                      type: 'updateinnerTabs',
-                      extensionTabs: 1,
-                    });
-                  });
-                }}
-              >
-                Project Metrics
-              </div>
-              <div
-                className={activeTab === 2 ? styles.activeTab : styles.tab}
-                onClick={() => {
-                  setActiveTab(2);
-                  chrome.storage.local.set({ extensionTabs: 2 }, () => {
-                    chrome.runtime.sendMessage({
-                      type: 'updateinnerTabs',
-                      extensionTabs: 2,
-                    });
-                  });
-                }}
-              >
-                Metrics Evaluation
-              </div>
+              <select value={activeTab} onChange={handleSelectChange}>
+                <option value="0">Users Metrics</option>
+                <option value="1">Project Metrics</option>
+                <option value="2">Metrics Evaluation</option>
+                <option value="3">Strategic Indicators</option>
+              </select>
             </div>
           </div>
           {loading ? (
@@ -201,6 +182,11 @@ export default function Metrics(props) {
                     lasteval={lastreport}
                     report={report}
                   />
+                </div>
+              )}
+              {activeTab === 3 && (
+                <div className={styles.tabPanel}>
+                  <StrategicMetrics strategic={strategic}/>
                 </div>
               )}
             </>
