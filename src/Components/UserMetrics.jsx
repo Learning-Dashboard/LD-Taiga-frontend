@@ -89,7 +89,30 @@ export default function UserMetrics(props) {
 
   useEffect(() => {
     if (props.dataus) {
-      setDataMetrics(props.dataus);
+      console.log("props datus: ", props.dataus);
+
+      const output = {
+        assignedtasks: [],
+        closedtasks: [],
+        commits: [],
+        modifiedlines: [],
+      };
+
+      for (const name in props.dataus) {
+        if (props.dataus.hasOwnProperty(name)) {
+          props.dataus[name].forEach(item => {
+            const idParts = item.id.split('_');
+            const key = idParts[0];
+            
+            if (output.hasOwnProperty(key)) {
+              output[key].push(item);
+            }
+          });
+        }
+      }
+
+      console.log("output: ", output);
+      setDataMetrics(output);
     }
 
     if (props.categories) {
@@ -114,6 +137,7 @@ export default function UserMetrics(props) {
   }, [props.dataus, props.categories]);
 
   const handleFilterButtonClick = (selectedCategory) => {
+    console.log("selectedCategory: ", selectedCategory);
     if (selectedFilters.includes(selectedCategory)) {
       let filters = selectedFilters.filter((el) => el !== selectedCategory);
       setSelectedFilters(filters);
@@ -275,7 +299,7 @@ export default function UserMetrics(props) {
         </div>
       ) : (
         <div
-          className={styles.speedometers_grid}
+          className={styles.speedometers_container}
         >
           {Object.keys(dataMetrics).map((key) => {
             if (
@@ -284,45 +308,43 @@ export default function UserMetrics(props) {
             ) {
               return (
                 <>
-                  {/* <hr style={{ width: '500px' }} />
-                  <br /> */}
-
-                  <div className={styles.speedometers_container}>
-                    {/* <div className={styles.titulo}>
-                      <div className={styles.infoTit}>{key} </div>
-                    </div> */}
-                    {dataMetrics[key].map((dato) => (
-                      <>
-                        {(selectedFilters.includes(
-                          dato.id
-                            .toLowerCase()
-                            .substring(0, dato.id.indexOf('_'))
-                        ) ||
-                          selectedFilters.includes(
-                            dato.qualityFactors[0].toLowerCase()
-                          )) && (
-                          <div key={dato.id} className={styles.speedometers}>
-                            <Speedometer
-                              value={dato.value * 100}
-                              text={dato.name}
-                              data={
-                                dato.qualityFactors &&
-                                (dato.qualityFactors.includes('commits') ||
-                                  dato.qualityFactors.includes(
-                                    'modifiedlinescontribution'
-                                  ))
-                                  ? {
+                {(selectedFilters.includes(
+                    key.toLowerCase()
+                ) ||
+                  selectedFilters.includes(
+                    dataMetrics[key][0].qualityFactors[0].toLowerCase()
+                  )) && (
+                    <>
+                      <hr style={{ width: '500px' }} />
+                      <br />
+                      <div className={styles.titulo} >
+                        <div className={styles.infoTit}>{key} </div>
+                        </div>
+                          <div className={styles.speedometers_grid}>
+                              
+                            {dataMetrics[key].map((dato) => (      
+                              <div key={dato.id} className={styles.speedometers}>
+                                <Speedometer
+                                  value={dato.value * 100}
+                                  text={dato.name}
+                                  data={
+                                    dato.qualityFactors &&
+                                    (dato.qualityFactors.includes('commits') ||
+                                    dato.qualityFactors.includes(
+                                      'modifiedlinescontribution'
+                                    ))
+                                    ? {
                                       values: [0, 1],
                                       colors: ['rgba(99, 132, 255)'],
                                     }
-                                  : categories.memberscontribution
-                              }
-                            />
-                          </div>
-                        )}
-                      </>
-                    ))}
-                  </div>
+                                    : categories.memberscontribution
+                                  }
+                                />
+                              </div>                                  
+                            ))}
+                        </div>
+                    </>
+                  )}
                 </>
               );
             }

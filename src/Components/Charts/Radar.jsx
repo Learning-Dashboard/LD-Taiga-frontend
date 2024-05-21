@@ -20,7 +20,6 @@ ChartJS.register(
 );
 
 const RadarChart = (props) => {
-  console.log("dataset chart: ", props.dataset);
   const datachart = {
     labels: [
       'Tasks' +
