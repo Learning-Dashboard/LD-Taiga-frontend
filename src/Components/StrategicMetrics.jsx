@@ -32,7 +32,7 @@ export default function StrategicMetrics(props) {
                                     data={
                                         {
                                             values: [0, ...dato.probabilities.map((row) => row.upperThreshold).reverse()],
-                                            colors: dato.probabilities.map((row) => row.color)
+                                            colors: dato.probabilities.map((row) => row.color).reverse()
                                         } 
                                     }
                                 />
