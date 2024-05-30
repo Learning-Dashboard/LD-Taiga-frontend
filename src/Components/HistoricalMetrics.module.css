@@ -1,0 +1,16 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.actionContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    background-color: whitesmoke;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: row;
+}

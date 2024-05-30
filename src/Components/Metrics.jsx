@@ -6,6 +6,8 @@ import ProjectMetrics from './ProjectMetrics';
 import EvalMetrics from './EvalMetrics.jsx';
 import ReactLoading from 'react-loading';
 import StrategicMetrics from './StrategicMetrics.jsx';
+import QuaityFactors from './QualityFactors.jsx';
+import HistoricalMetrics from './HistoricalMetrics.jsx';
 
 function reload() {
   chrome.runtime.sendMessage({
@@ -22,6 +24,8 @@ export default function Metrics(props) {
   const [activeTab, setActiveTab] = useState(0);
   const [categories, setCategories] = useState(null); // Initialize as null
   const [strategic, setStrategic] = useState(null);
+  const [factors, setFactors] = useState(null);
+  const [historical, setHistorical] = useState(null);
   const [lastreport, setLastreport] = useState(null);
   const [report, setReport] = useState(null);
 
@@ -37,11 +41,23 @@ export default function Metrics(props) {
         : setActiveTab(data.extensionTabs);
     });
 
+    fetch(`http://localhost:3000/api/projects/${props.proyecto}/historical_metrics`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("historical: ", data);
+        setHistorical(data);
+      })
+
+    fetch(`http://localhost:3000/api/projects/${props.proyecto}/quality_factors`)
+      .then((response) => response.json())
+      .then((data) => {
+        setFactors(data);
+      })
+
     fetch(`http://localhost:3000/api/projects/${props.proyecto}/strategic_indicators`)
       .then((response) => response.json())
       .then((data) => {
         setStrategic(data);
-        console.log("strategic: ", data)
       });
 
     fetch(`http://localhost:3000/api/projects/${props.proyecto}/metricscategories`)
@@ -123,6 +139,8 @@ export default function Metrics(props) {
               <option value="1">Project Metrics</option>
               <option value="2">Metrics Evaluation</option>
               <option value="3">Strategic Indicators</option>
+              <option value="4">Quality Factors</option>
+              <option value="5">Historical Metrics</option>
             </select>
           </div>
         </div>
@@ -179,6 +197,16 @@ export default function Metrics(props) {
             {activeTab === 3 && (
               <div className={styles.tabPanel}>
                 <StrategicMetrics strategic={strategic}/>
+              </div>
+            )}
+            {activeTab === 4 && (
+              <div className={styles.tabPanel}>
+                <QuaityFactors data={factors} categories={categories}/>
+              </div>
+            )}
+             {activeTab === 5 && (
+              <div className={styles.tabPanel}>
+                <HistoricalMetrics data={factors}/>
               </div>
             )}
           </>
