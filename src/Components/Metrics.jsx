@@ -31,9 +31,6 @@ export default function Metrics(props) {
 
   useEffect(() => {
     chrome.storage.local.get('extensionTabs', (data) => {
-      console.log('tabs:');
-      console.log(data);
-
       data &&
       Object.keys(data).length === 0 &&
       Object.getPrototypeOf(data) === Object.prototype
@@ -44,7 +41,6 @@ export default function Metrics(props) {
     fetch(`http://localhost:3000/api/projects/${props.proyecto}/historical_metrics`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("historical: ", data);
         setHistorical(data);
       })
 
@@ -206,7 +202,7 @@ export default function Metrics(props) {
             )}
              {activeTab === 5 && (
               <div className={styles.tabPanel}>
-                <HistoricalMetrics data={factors}/>
+                <HistoricalMetrics data={historical}/>
               </div>
             )}
           </>

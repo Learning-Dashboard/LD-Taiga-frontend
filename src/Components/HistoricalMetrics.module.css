@@ -1,16 +1,31 @@
 .mainContainer {
     display: flex;
     flex-direction: column;
+    width: 500px;
 }
 
 .actionContainer {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    background-color: whitesmoke;
+    justify-content: space-between;
 }
 
 .inputContainer {
     display: flex;
     flex-direction: row;
+    align-items: center;
+}
+
+.charContainer{
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+}
+
+.linearChart {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+    margin-bottom: 40px;
 }
