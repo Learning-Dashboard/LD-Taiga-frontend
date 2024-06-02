@@ -24,9 +24,10 @@
 
 .tabList {
   display: flex;
-  justify-content: space-around;
   list-style: none;
   margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0;
 }
 
@@ -109,4 +110,13 @@
   padding-top: 350px;
   padding-bottom: 400px;
   padding-left: 20px;
+}
+
+
+.buttonHistorical {
+  margin-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 8px;
+  align-content: center;
 }
