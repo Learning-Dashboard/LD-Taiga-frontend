@@ -1,4 +1,4 @@
-import LineChart from './Charts/LineChart';
+import LineChart from '../Charts/LineChart';
 import styles from './HistoricalMetrics.module.css';
 
 import { useState, useEffect, useRef } from 'react';

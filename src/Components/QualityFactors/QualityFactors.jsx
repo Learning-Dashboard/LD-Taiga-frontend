@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import styles from './QualityFactors.module.css';
-import Speedometer from './Charts/Speedometer';
+import Speedometer from '../Charts/Speedometer';
 
 export default function QualityFactors(props) {
     const [dataMetrics, setDataMetrics] = useState([]);

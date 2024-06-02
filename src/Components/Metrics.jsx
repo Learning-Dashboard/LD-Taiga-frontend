@@ -1,13 +1,13 @@
 import styles from './Metrics.module.css';
 import { useState, useEffect } from 'react';
 import 'react-tabs/style/react-tabs.css';
-import UserMetrics from './UserMetrics';
-import ProjectMetrics from './ProjectMetrics';
-import EvalMetrics from './EvalMetrics.jsx';
+import UserMetrics from './UserMetrics/UserMetrics.jsx';
+import ProjectMetrics from './ProjectMetrics/ProjectMetrics';
+import EvalMetrics from './EvalMetrics/EvalMetrics.jsx';
 import ReactLoading from 'react-loading';
-import StrategicMetrics from './StrategicMetrics.jsx';
-import QuaityFactors from './QualityFactors.jsx';
-import HistoricalMetrics from './HistoricalMetrics.jsx';
+import StrategicMetrics from './StrategicMetrics/StrategicMetrics.jsx';
+import QuaityFactors from './QualityFactors/QualityFactors.jsx';
+import HistoricalMetrics from './HistoricalMetrics/HistoricalMetrics.jsx';
 
 function reload() {
   chrome.runtime.sendMessage({

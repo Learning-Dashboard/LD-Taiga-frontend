@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 
 import styles from './StrategicMetrics.module.css';
-import Speedometer from './Charts/Speedometer';
+import Speedometer from '../Charts/Speedometer';
 
 export default function StrategicMetrics(props) {
 

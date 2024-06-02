@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './EvalMetrics.module.css';
-import RadarChart from './Charts/Radar';
-import PieChart from './Charts/PieChart';
+import RadarChart from '../Charts/Radar';
+import PieChart from '../Charts/PieChart';
 import { Typewriter } from 'react-simple-typewriter';
 
 const colors = [

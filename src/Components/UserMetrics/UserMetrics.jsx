@@ -1,7 +1,7 @@
 import styles from './UserMetrics.module.css';
 import { useState, useEffect } from 'react';
-import RadarChart from './Charts/Radar';
-import Speedometer from './Charts/Speedometer';
+import RadarChart from '../Charts/Radar';
+import Speedometer from '../Charts/Speedometer';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import { motion } from 'framer-motion';

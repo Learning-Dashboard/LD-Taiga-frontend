@@ -1,6 +1,6 @@
 import styles from './ProjectMetrics.module.css';
 import { useState, useEffect } from 'react';
-import Speedometer from './Charts/Speedometer';
+import Speedometer from '../Charts/Speedometer';
 import { motion } from 'framer-motion';
 import { TbAdjustments } from 'react-icons/tb';
 
