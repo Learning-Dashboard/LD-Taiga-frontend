@@ -20,15 +20,16 @@ export default function HistoricalMetrics(props) {
     useEffect(() => {
         if (props.data) { 
             console.log("historical data: ", props.data);
-             
+
             const result = props.data.reduce((acc, current) => {
-                const { id } = current;
+                const id = current.id === null ? "id" : current.id;
+                const updatedCurrent = { ...current, id };  // Update the object
                 if (!acc[id]) {
                   acc[id] = [];
                 }
-                acc[id].push(current);
+                acc[id].push(updatedCurrent);
                 return acc;
-            }, {});
+            }, {}); 
 
             setData(result);
             setOriginalData(result);

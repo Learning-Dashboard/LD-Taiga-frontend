@@ -33,7 +33,7 @@ export default function Metrics(props) {
   const [strategic, setStrategic] = useState(null);
   const [factors, setFactors] = useState(null);
   const [isHistorical, setIsHistorical] = useState(false);
-  const [historical, setHistorical] = useState(null);
+  const [historicalData, setHistorical] = useState(null);
   const [lastreport, setLastreport] = useState(null);
   const [report, setReport] = useState(null);
 
@@ -49,6 +49,7 @@ export default function Metrics(props) {
     fetch(`http://localhost:3000/api/projects/${props.proyecto}/historical_metrics`)
       .then((response) => response.json())
       .then((data) => {
+        console.log("historical: ", data);
         setHistorical(data);
       })
 
@@ -154,12 +155,18 @@ export default function Metrics(props) {
               <option value="4">Quality Factors</option>
             </select>
           </div>
-          <div className={styles.buttonHistorical} style={{backgroundColor: isHistorical ? '#FFC380' : ''}} onClick={handleClickHistorical}>
-            <FontAwesomeIcon icon={faCalendar} />
-          </div>
-          <div className={styles.buttonHistorical} style={{backgroundColor: !isHistorical ? '#FFC380' : ''}} onClick={handleClickNotHistorical}>
-            <FontAwesomeIcon icon={solidClockRotateLeft} />
-          </div>
+          { activeTab !== 2 ?
+            <>
+              <div className={styles.buttonHistorical} style={{backgroundColor: isHistorical ? '#FFC380' : ''}} onClick={handleClickHistorical}>
+                <FontAwesomeIcon icon={faCalendar} />
+              </div>
+              <div className={styles.buttonHistorical} style={{backgroundColor: !isHistorical ? '#FFC380' : ''}} onClick={handleClickNotHistorical}>
+                <FontAwesomeIcon icon={solidClockRotateLeft} />
+              </div>
+            </>
+            :
+            ''
+          }
         </div>
             
         {loading ? (
@@ -194,7 +201,7 @@ export default function Metrics(props) {
             {activeTab === 0 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics historical={historical.userMetrics}/>)
+                  (<HistoricalMetrics data={historicalData.userMetrics}/>)
                   :
                   (<UserMetrics dataus={usdata} categories={categories}/>)
                 }
@@ -203,7 +210,7 @@ export default function Metrics(props) {
             {activeTab === 1 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics historical={historical.projectMetrics}/>)
+                  (<HistoricalMetrics data={historicalData.projectMetrics}/>)
                   :
                   (<ProjectMetrics data={pdata} categories={categories}/>)
                 }
@@ -211,23 +218,19 @@ export default function Metrics(props) {
             )}
             {activeTab === 2 && (
               <div className={styles.tabPanel}>
-                { isHistorical ?
-                  (<HistoricalMetrics historical={historical.evalMetrics}/>)
-                  :
-                  (<EvalMetrics
-                    data={usdata}
-                    hoursData={hours}
-                    proyecto={props.proyecto}
-                    lasteval={lastreport}
-                    report={report}
-                  />)
-                }
+                    <EvalMetrics
+                      data={usdata}
+                      hoursData={hours}
+                      proyecto={props.proyecto}
+                      lasteval={lastreport}
+                      report={report}
+                    />
               </div>
             )}
             {activeTab === 3 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics historical={historical.strategicMetrics}/>)
+                  (<HistoricalMetrics data={historicalData.strategicMetrics}/>)
                   :
                   (<StrategicMetrics strategic={strategic}/>)
                 }
@@ -236,7 +239,7 @@ export default function Metrics(props) {
             {activeTab === 4 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics historical={historical.qualityFactors}/>)
+                  (<HistoricalMetrics data={historicalData.qualityFactors}/>)
                   :
                   (<QuaityFactors data={factors} categories={categories}/>)
                 }
