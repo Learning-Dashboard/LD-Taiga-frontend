@@ -22,9 +22,6 @@ export default function ProjectMetrics(props) {
       setCategories(props.categories);
     }
     chrome.storage.local.get('projectFilters', (data) => {
-      console.log('projectFilters:');
-      console.log(data);
-
       data &&
       Object.keys(data).length === 0 &&
       Object.getPrototypeOf(data) === Object.prototype

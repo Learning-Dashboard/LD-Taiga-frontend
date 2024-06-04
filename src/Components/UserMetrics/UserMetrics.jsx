@@ -35,20 +35,12 @@ const colorBorder = [
 
 function extractvalues(data) {
   extractValues(data);
-  doNothing()
   var result = [];
   data.map((dato) => result.push(dato.value * 100));
   return result;
 }
 
-function doNothing() {
-  console.log("do nothin");
-}
-
 function extractValues(data) {
-  
-  console.log("extractValues: ", data);
-
   //Get the max value of the array to do the chart with %
   let max = 0;
   data.forEach(element => {
@@ -56,10 +48,8 @@ function extractValues(data) {
       max = element*100;
     }
   });
-  console.log("max: ", max);
 
   const result = data.map((val) => {return ((val.value*100)/max)*100})
-  console.log("result values: ", result);
 }
 
 export default function UserMetrics(props) {
@@ -89,8 +79,6 @@ export default function UserMetrics(props) {
 
   useEffect(() => {
     if (props.dataus) {
-      console.log("props datus: ", props.dataus);
-
       const output = {
         assignedtasks: [],
         closedtasks: [],
@@ -111,7 +99,6 @@ export default function UserMetrics(props) {
         }
       }
 
-      console.log("output: ", output);
       setDataMetrics(output);
     }
 
@@ -137,7 +124,6 @@ export default function UserMetrics(props) {
   }, [props.dataus, props.categories]);
 
   const handleFilterButtonClick = (selectedCategory) => {
-    console.log("selectedCategory: ", selectedCategory);
     if (selectedFilters.includes(selectedCategory)) {
       let filters = selectedFilters.filter((el) => el !== selectedCategory);
       setSelectedFilters(filters);
@@ -159,7 +145,7 @@ export default function UserMetrics(props) {
         }
       );
     }
-  };
+  }; 
 
   const handleFilterButtonClickStudents = (selectedStudent) => {
     if (selectedFiltersStudents.includes(selectedStudent)) {
@@ -245,7 +231,6 @@ export default function UserMetrics(props) {
           }}
         >
           {Object.keys(dataMetrics).map((key, index) => {
-            console.log(selectedFiltersStudents);
             if (
               selectedFiltersStudents.length <= 0 ||
               selectedFiltersStudents.includes(key)

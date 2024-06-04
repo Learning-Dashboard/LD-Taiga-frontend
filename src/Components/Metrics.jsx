@@ -49,7 +49,6 @@ export default function Metrics(props) {
     fetch(`http://localhost:3000/api/projects/${props.proyecto}/historical_metrics`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("historical: ", data);
         setHistorical(data);
       })
 

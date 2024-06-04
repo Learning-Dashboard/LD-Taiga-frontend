@@ -76,7 +76,6 @@ const Login = () => {
         // mostrar error de autenticación
         const data = await response.json();
         setErrorMessage(data.error);
-        console.log('aaaaa');
         setLoading(false);
       }
       clearForm();

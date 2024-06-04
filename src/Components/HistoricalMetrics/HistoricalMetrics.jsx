@@ -1,6 +1,8 @@
 import LineChart from '../Charts/LineChart';
 import styles from './HistoricalMetrics.module.css';
 
+import { motion } from 'framer-motion';
+import { TbAdjustments } from 'react-icons/tb';
 import { useState, useEffect, useRef } from 'react';
 
 export default function HistoricalMetrics(props) {
@@ -15,11 +17,14 @@ export default function HistoricalMetrics(props) {
 
     const [data, setData] = useState([]);
     const [originalData, setOriginalData] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);         
 
+    const [selectedFilters, setSelectedFilters] = useState([]);
+
+    const filters = ["assignedtasks", "closedtasks", "commits", "modifiedlines"];
 
     useEffect(() => {
         if (props.data) { 
-            console.log("historical data: ", props.data);
 
             const result = props.data.reduce((acc, current) => {
                 const id = current.id === null ? "id" : current.id;
@@ -33,7 +38,6 @@ export default function HistoricalMetrics(props) {
 
             setData(result);
             setOriginalData(result);
-            console.log("formattedOutput: ", result);
         } 
 
     }, [props.data]);
@@ -56,17 +60,42 @@ export default function HistoricalMetrics(props) {
         Object.keys(data).forEach(key => {
             filteredData[key] = data[key].filter(item => {
                 const itemDate = new Date(item.date);
-
-                console.log("filetr date: ",  itemDate);
-                console.log("toDate time: ",  new Date(toDate));
-                console.log("fromDate time: ",  new Date(fromDate));
-
                 return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
             });
         });
     
         setData(filteredData);
     };
+
+    function handleFilterButtonClick(key) {
+        const array = [...selectedFilters];
+        
+        if (array.includes(key)) {
+            const index = array.indexOf(key);
+            if (index !== -1) {
+                array.splice(index, 1);
+            }
+            setSelectedFilters(array);
+        } else {
+            array.push(key);
+            setSelectedFilters(array);
+        }
+    }
+
+    function handleClick() {
+        setIsOpen(!isOpen);
+    }
+
+    function isSelected(key) {
+        const some = selectedFilters.some((s) => {  
+            if (s.length < key.length) {
+                return key.includes(s);
+            } else {
+                return s.includes(key);
+            }
+        });
+        return (selectedFilters.length <= 0 || some)
+    }
 
     return (
         <div className={styles.mainContainer}>
@@ -92,27 +121,59 @@ export default function HistoricalMetrics(props) {
                 </div>
             </div>
 
+            <div className={styles.filter_container}>
+                <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
+                    <div className={styles.filtername}>Filters</div>
+                    <div
+                        className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`} 
+                    >
+                        <TbAdjustments size={20} />
+                    </div>
+                </motion.div>
+
+                {isOpen && (
+                    <>
+                        <div>
+                            {filters.map((key) => (
+                                <button
+                                    onClick={() => handleFilterButtonClick(key)}
+                                    className={
+                                        selectedFilters?.includes(key)
+                                        ? styles.buttons_active
+                                        : styles.buttons
+                                    }
+                                    >
+                                    {key}
+                                </button>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+
             <div className={styles.charContainer}>
                 {data ? (
                     Object.keys(data).map((key) => (
                         <div key={key}>
-                            <div className={styles.linearChart}>
-                                <LineChart
-                                    data={{
-                                        labels: data[key].map((row) => row.date),
-                                        datasets: [
-                                            {
-                                                label: "First dataset",
-                                                data: data[key].map((row) => row.value.first),
-                                                fill: true,
-                                                backgroundColor: "rgba(75,192,192,0.2)",
-                                                borderColor: "rgba(75,192,192,1)"
-                                            }
-                                        ]
-                                    }}
-                                />
-                                <div>{key}</div>
-                            </div>
+                            {isSelected(key) && (
+                                <div className={styles.linearChart}>
+                                    <LineChart
+                                        data={{
+                                            labels: data[key].map((row) => row.date),
+                                            datasets: [
+                                                {
+                                                    label: "First dataset",
+                                                    data: data[key].map((row) => row.value.first),
+                                                    fill: true,
+                                                    backgroundColor: "rgba(75,192,192,0.2)",
+                                                    borderColor: "rgba(75,192,192,1)"
+                                                }
+                                            ]
+                                        }}
+                                    />
+                                    <div>{key}</div>
+                                </div>
+                            )}
                         </div>
                     ))
                 ) : (
