@@ -21,11 +21,12 @@ export default function HistoricalMetrics(props) {
 
     const [selectedFilters, setSelectedFilters] = useState([]);
 
+    const [showFilter, setShowFilter] = useState(1);
+
     const filters = ["assignedtasks", "closedtasks", "commits", "modifiedlines"];
 
     useEffect(() => {
         if (props.data) { 
-
             const result = props.data.reduce((acc, current) => {
                 const id = current.id === null ? "id" : current.id;
                 const updatedCurrent = { ...current, id };  // Update the object
@@ -40,6 +41,10 @@ export default function HistoricalMetrics(props) {
             setOriginalData(result);
         } 
 
+        if (props.type) {
+            console.log("type: ", props.type);
+            setShowFilter(props.type !== 3);
+        }
     }, [props.data]);
 
     
@@ -82,6 +87,21 @@ export default function HistoricalMetrics(props) {
         }
     }
 
+    function getData(data, key) {
+        return data[key].map((row) => {
+            console.log("row.value.first: ", row.value.first);
+            console.log("row.value: ", row.value);
+
+            if (row.value.first === undefined) {
+                console.log("row.value: ", row.value);
+                return row.value.toFixed(2);
+            } else {
+                console.log("row.value.first: ", row.value.first);
+                return row.value.first.toFixed(2);
+            }
+        })
+    }
+
     function handleClick() {
         setIsOpen(!isOpen);
     }
@@ -121,6 +141,7 @@ export default function HistoricalMetrics(props) {
                 </div>
             </div>
 
+            {showFilter && (
             <div className={styles.filter_container}>
                 <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
                     <div className={styles.filtername}>Filters</div>
@@ -150,6 +171,7 @@ export default function HistoricalMetrics(props) {
                     </>
                 )}
             </div>
+            )}
 
             <div className={styles.charContainer}>
                 {data ? (
@@ -163,7 +185,7 @@ export default function HistoricalMetrics(props) {
                                             datasets: [
                                                 {
                                                     label: "First dataset",
-                                                    data: data[key].map((row) => row.value.first),
+                                                    data: getData(data, key),
                                                     fill: true,
                                                     backgroundColor: "rgba(75,192,192,0.2)",
                                                     borderColor: "rgba(75,192,192,1)"

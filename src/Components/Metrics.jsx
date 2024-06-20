@@ -147,11 +147,11 @@ export default function Metrics(props) {
         <div className={styles.tabList}>
           <div className={styles.tabcont}>
             <select value={activeTab} onChange={handleSelectChange}>
-              <option value="0">Users Metrics</option>
-              <option value="1">Project Metrics</option>
-              <option value="2">Metrics Evaluation</option>
               <option value="3">Strategic Indicators</option>
               <option value="4">Quality Factors</option>
+              <option value="1">Project Metrics</option>
+              <option value="0">Users Metrics</option>
+              <option value="2">Metrics Evaluation</option>
             </select>
           </div>
           { activeTab !== 2 ?
@@ -200,7 +200,7 @@ export default function Metrics(props) {
             {activeTab === 0 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics data={historicalData.userMetrics}/>)
+                  (<HistoricalMetrics data={historicalData.userMetrics} type={activeTab}/>)
                   :
                   (<UserMetrics dataus={usdata} categories={categories}/>)
                 }
@@ -209,7 +209,7 @@ export default function Metrics(props) {
             {activeTab === 1 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics data={historicalData.projectMetrics}/>)
+                  (<HistoricalMetrics data={historicalData.projectMetrics} type={activeTab}/>)
                   :
                   (<ProjectMetrics data={pdata} categories={categories}/>)
                 }
@@ -229,7 +229,7 @@ export default function Metrics(props) {
             {activeTab === 3 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics data={historicalData.strategicMetrics}/>)
+                  (<HistoricalMetrics data={historicalData.strategicMetrics} type={activeTab}/>)
                   :
                   (<StrategicMetrics strategic={strategic}/>)
                 }
@@ -238,7 +238,7 @@ export default function Metrics(props) {
             {activeTab === 4 && (
               <div className={styles.tabPanel}>
                 { isHistorical ?
-                  (<HistoricalMetrics data={historicalData.qualityFactors}/>)
+                  (<HistoricalMetrics data={historicalData.qualityFactors} type={activeTab}/>)
                   :
                   (<QuaityFactors data={factors} categories={categories}/>)
                 }
