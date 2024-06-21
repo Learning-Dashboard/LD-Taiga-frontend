@@ -37,6 +37,9 @@ export default function Metrics(props) {
   const [lastreport, setLastreport] = useState(null);
   const [report, setReport] = useState(null);
 
+  //http://localhost:3000/ 
+  const host = 'http://gessi-dashboard.essi.upc.edu:3000/'; //this is the production host
+
   useEffect(() => {
     chrome.storage.local.get('extensionTabs', (data) => {
       data &&
@@ -46,39 +49,39 @@ export default function Metrics(props) {
         : setActiveTab(data.extensionTabs);
     });
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/historical_metrics`)
+    fetch(host+`api/projects/${props.proyecto}/historical_metrics`)
       .then((response) => response.json())
       .then((data) => {
         setHistorical(data);
       })
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/quality_factors`)
+    fetch(host+`api/projects/${props.proyecto}/quality_factors`)
       .then((response) => response.json())
       .then((data) => {
         setFactors(data);
       })
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/strategic_indicators`)
+    fetch(host+`api/projects/${props.proyecto}/strategic_indicators`)
       .then((response) => response.json())
       .then((data) => {
         setStrategic(data);
       });
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/metricscategories`)
+    fetch(host+`api/projects/${props.proyecto}/metricscategories`)
       .then((response) => response.json())
       .then((data) => {
         setCategories(data);
       })
       .catch((error) => console.error(error));
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/hours`)
+    fetch(host+`api/projects/${props.proyecto}/hours`)
       .then((response) => response.json())
       .then((data) => {
         setHours(data);
       })
       .catch((error) => console.error(error));
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/projectmetrics`)
+    fetch(host+`api/projects/${props.proyecto}/projectmetrics`)
       .then((response) => response.json())
       .then((data) => {
         data.error ? setError(true) : setError(false);
@@ -92,7 +95,7 @@ export default function Metrics(props) {
       });
 
     setLoading(true);
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/usersmetrics`)
+    fetch(host+`api/projects/${props.proyecto}/usersmetrics`)
       .then((response) => response.json())
       .then((data) => {
         data.error ? setError(true) : setError(false);
@@ -105,7 +108,7 @@ export default function Metrics(props) {
         console.error(error);
       });
 
-    fetch(`http://localhost:3000/api/projects/${props.proyecto}/lastreport`)
+    fetch(host+`api/projects/${props.proyecto}/lastreport`)
       .then((response) => response.json())
       .then((data) => {
         data.error ? setError(true) : setError(false);
