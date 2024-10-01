@@ -34,7 +34,7 @@ const Login = () => {
     // Aquí llamarías a tu backend para autenticar al usuario
     // Si el usuario es autenticado con éxito, establecerías isLoggedIn a true
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch('https://gessi-dashboard.essi.upc.edu/', {
         method: 'POST',
         body: JSON.stringify({ username, password }),
         headers: {

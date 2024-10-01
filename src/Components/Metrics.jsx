@@ -38,7 +38,7 @@ export default function Metrics(props) {
   const [report, setReport] = useState(null);
 
   //http://localhost:3000/ 
-  const host = 'http://gessi-dashboard.essi.upc.edu:3000/'; //this is the production host
+  const host = 'https://gessi-dashboard.essi.upc.edu/'; //this is the production host
 
   useEffect(() => {
     chrome.storage.local.get('extensionTabs', (data) => {

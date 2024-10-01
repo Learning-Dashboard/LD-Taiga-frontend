@@ -25,10 +25,8 @@
 ],
 "host_permissions": [
     "http://localhost:3000/*",
-    "https://proxy-tfg.vercel.app/",
-    "http://gessi-dashboard.essi.upc.edu:3000/"
-    ,"https://tree.taiga.io/*",
-    "https://cors-anywhere.herokuapp.com/*"
+    "https://gessi-dashboard.essi.upc.edu/",
+    "https://tree.taiga.io/*"
 ],
   "devtools_page": "devtools.html",
   "web_accessible_resources": [
