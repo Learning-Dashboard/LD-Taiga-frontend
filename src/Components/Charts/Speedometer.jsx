@@ -9,16 +9,16 @@ function Speedometer(props) {
         height={150}
         needleHeightRatio={0.7}
         minValue={0}
-        maxValue={100}
+        maxValue={1}
         value={Math.round(props.value)}
-        customSegmentStops={props.data ? props.data.values.map(val => Math.round(val*100)) : []}
+        customSegmentStops={props.data ? props.data.values : []}
         segmentColors={props.data ? props.data.colors : []}
         ringWidth={47}
         needleTransitionDuration={2222}
         needleTransition="easeElastic"
         needleColor={'#90f2ff'}
         textColor={'#000'}
-        currentValueText={`${Math.round(props.value)}%`} 
+        valueFormat={'.0%'}
       />
       <div>
         {props.text && props.value !== undefined
