@@ -10,7 +10,7 @@ function Speedometer(props) {
         needleHeightRatio={0.7}
         minValue={0}
         maxValue={1}
-        value={Math.round(props.value)}
+        value={Math.round(props.value)/100}
         customSegmentStops={props.data ? props.data.values : []}
         segmentColors={props.data ? props.data.colors : []}
         ringWidth={47}
