@@ -2,10 +2,9 @@ import React from 'react';
 import ReactSpeedometer from 'react-d3-speedometer';
 
 function Speedometer(props) {
-  
   return (
-    <div>
-      <ReactSpeedometer
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}} >
+      <ReactSpeedometer 
         width={250}
         height={150}
         needleHeightRatio={0.7}
@@ -19,6 +18,7 @@ function Speedometer(props) {
         needleTransition="easeElastic"
         needleColor={'#90f2ff'}
         textColor={'#000'}
+        currentValueText={`${Math.round(props.value)}%`} 
       />
       <div>
         {props.text && props.value !== undefined
