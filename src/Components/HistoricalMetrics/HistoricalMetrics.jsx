@@ -193,7 +193,7 @@ export default function HistoricalMetrics(props) {
                                             ]
                                         }}
                                     />
-                                    <div>{key}</div>
+                                    <div>{data[key][0].name}</div>
                                 </div>
                             )}
                         </div>
