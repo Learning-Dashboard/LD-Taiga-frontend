@@ -19,11 +19,11 @@ export default function HistoricalMetrics(props) {
     const [originalData, setOriginalData] = useState([]);
     const [isOpen, setIsOpen] = useState(false);         
 
-    const [selectedFilters, setSelectedFilters] = useState([]);
+    const [selectedFiltersKeys, setSelectedFiltersKeys] = useState([]);
 
-    const [showFilter, setShowFilter] = useState(1);
+    const [showFilter, setShowFilter] = useState(true);
 
-    const filters = ["assignedtasks", "closedtasks", "commits", "modifiedlines"];
+    const [filters, setFilters] = useState([]);
 
     useEffect(() => {
         if (props.data) { 
@@ -36,15 +36,19 @@ export default function HistoricalMetrics(props) {
                 acc[id].push(updatedCurrent);
                 return acc;
             }, {}); 
-
+            
             setData(result);
             setOriginalData(result);
+
+            if (props.type){
+                if(props.type === 3) setShowFilter(false);
+                else {
+                    const dynamicFilters = Object.keys(result);
+                    setFilters(dynamicFilters);
+                }
+            }
         } 
 
-        if (props.type) {
-            console.log("type: ", props.type);
-            setShowFilter(props.type !== 3);
-        }
     }, [props.data]);
 
     
@@ -73,18 +77,14 @@ export default function HistoricalMetrics(props) {
     };
 
     function handleFilterButtonClick(key) {
-        const array = [...selectedFilters];
+        let updateSelectedFiltersKeys = [...selectedFiltersKeys];
         
-        if (array.includes(key)) {
-            const index = array.indexOf(key);
-            if (index !== -1) {
-                array.splice(index, 1);
-            }
-            setSelectedFilters(array);
-        } else {
-            array.push(key);
-            setSelectedFilters(array);
-        }
+        if (updateSelectedFiltersKeys.includes(key)) 
+            updateSelectedFiltersKeys = updateSelectedFiltersKeys.filter((el) => el !== key);
+        else 
+            updateSelectedFiltersKeys.push(key);
+
+        setSelectedFiltersKeys(updateSelectedFiltersKeys);
     }
 
     function getData(data, key) {
@@ -107,14 +107,7 @@ export default function HistoricalMetrics(props) {
     }
 
     function isSelected(key) {
-        const some = selectedFilters.some((s) => {  
-            if (s.length < key.length) {
-                return key.includes(s);
-            } else {
-                return s.includes(key);
-            }
-        });
-        return (selectedFilters.length <= 0 || some)
+        return (selectedFiltersKeys.length === 0 || selectedFiltersKeys.includes(key));
     }
 
     return (
@@ -157,14 +150,15 @@ export default function HistoricalMetrics(props) {
                         <div>
                             {filters.map((key) => (
                                 <button
+                                    key={key}
                                     onClick={() => handleFilterButtonClick(key)}
                                     className={
-                                        selectedFilters?.includes(key)
+                                        selectedFiltersKeys?.includes(key)
                                         ? styles.buttons_active
                                         : styles.buttons
                                     }
                                     >
-                                    {key}
+                                    {data[key][0].name}
                                 </button>
                             ))}
                         </div>

@@ -59,9 +59,32 @@
     padding: 5px;
 }
 
+.filtername {
+    margin: 0px 10px;
+    width: 30px;
+    align-self: center;
+}
+
 .filter_container {
     margin-top: 20px;
     border: #525252 1px solid;
 }
+
+.filterIcon {
+    margin: 0px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .black {
+    background-color: black;
+    color: white;
+  }
 
 
