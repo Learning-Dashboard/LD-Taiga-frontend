@@ -8,22 +8,22 @@ import { useState, useEffect, useRef } from 'react';
 export default function HistoricalMetrics(props) {
 
     const today = new Date();
-    const oneMonthLater = new Date();
-    oneMonthLater.setFullYear(oneMonthLater.getFullYear() -1);
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(oneYearLater.getFullYear() -1);
 
-    const [fromDate, setFromDate] = useState(oneMonthLater.toISOString().split('T')[0]);
+    const [fromDate, setFromDate] = useState(oneYearLater.toISOString().split('T')[0]);
 
     const [toDate, setToDate] = useState(today.toISOString().split('T')[0]); // Initialize to current date in YYYY-MM-DD format
 
-    const [data, setData] = useState([]);
-    const [originalData, setOriginalData] = useState([]);
+    const [data, setData] = useState({});
+    const [originalData, setOriginalData] = useState({});
     const [isOpen, setIsOpen] = useState(false);         
 
-    const [selectedFilters, setSelectedFilters] = useState([]);
+    const [selectedFiltersKeys, setSelectedFiltersKeys] = useState([]);
 
-    const [showFilter, setShowFilter] = useState(1);
+    const [showFilter, setShowFilter] = useState(true);
 
-    const filters = ["assignedtasks", "closedtasks", "commits", "modifiedlines"];
+    const [filters, setFilters] = useState([]);
 
     useEffect(() => {
         if (props.data) { 
@@ -36,55 +36,60 @@ export default function HistoricalMetrics(props) {
                 acc[id].push(updatedCurrent);
                 return acc;
             }, {}); 
-
+            
             setData(result);
             setOriginalData(result);
+
+            if (props.type){
+                if(props.type === 3) setShowFilter(false);
+                else {
+                    const dynamicFilters = Object.keys(result);
+                    setFilters(dynamicFilters);
+                }
+            }
         } 
 
-        if (props.type) {
-            console.log("type: ", props.type);
-            setShowFilter(props.type !== 3);
-        }
     }, [props.data]);
 
     
     const handleStartDateChange = (e) => {
         setFromDate(e.target.value);
-        filterDates();
     };
 
     
     const handleEndDateChange = (e) => {
         setToDate(e.target.value);
-        filterDates();
     }
 
-    function filterDates() {
-        const filteredData = {};
-    
-        Object.keys(data).forEach(key => {
-            filteredData[key] = data[key].filter(item => {
-                const itemDate = new Date(item.date);
-                return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
+    useEffect(() => {
+        // Función para filtrar los datos cuando cambian fromDate o toDate
+        function filterDates() {
+            if (!originalData) return;
+
+            const filteredData = {};
+
+            Object.keys(originalData).forEach(key => {
+                filteredData[key] = originalData[key].filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
+                });
             });
-        });
-    
-        setData(filteredData);
-    };
+
+            setData(filteredData);
+        }
+
+        filterDates();
+    }, [fromDate, toDate, originalData]);
 
     function handleFilterButtonClick(key) {
-        const array = [...selectedFilters];
+        let updateSelectedFiltersKeys = [...selectedFiltersKeys];
         
-        if (array.includes(key)) {
-            const index = array.indexOf(key);
-            if (index !== -1) {
-                array.splice(index, 1);
-            }
-            setSelectedFilters(array);
-        } else {
-            array.push(key);
-            setSelectedFilters(array);
-        }
+        if (updateSelectedFiltersKeys.includes(key)) 
+            updateSelectedFiltersKeys = updateSelectedFiltersKeys.filter((el) => el !== key);
+        else 
+            updateSelectedFiltersKeys.push(key);
+
+        setSelectedFiltersKeys(updateSelectedFiltersKeys);
     }
 
     function getData(data, key) {
@@ -107,14 +112,7 @@ export default function HistoricalMetrics(props) {
     }
 
     function isSelected(key) {
-        const some = selectedFilters.some((s) => {  
-            if (s.length < key.length) {
-                return key.includes(s);
-            } else {
-                return s.includes(key);
-            }
-        });
-        return (selectedFilters.length <= 0 || some)
+        return (selectedFiltersKeys.length === 0 || selectedFiltersKeys.includes(key));
     }
 
     return (
@@ -157,14 +155,15 @@ export default function HistoricalMetrics(props) {
                         <div>
                             {filters.map((key) => (
                                 <button
+                                    key={key}
                                     onClick={() => handleFilterButtonClick(key)}
                                     className={
-                                        selectedFilters?.includes(key)
+                                        selectedFiltersKeys?.includes(key)
                                         ? styles.buttons_active
                                         : styles.buttons
                                     }
                                     >
-                                    {key}
+                                    {data[key][0].name}
                                 </button>
                             ))}
                         </div>

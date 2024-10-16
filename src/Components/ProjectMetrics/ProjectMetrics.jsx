@@ -1,6 +1,6 @@
 import styles from './ProjectMetrics.module.css';
 import { useState, useEffect } from 'react';
-import Speedometer from '../Charts/Speedometer';
+import SpeedometerStyled from '../ReusableComponents/SpeedmeterStyled/SpeedometerStyled';
 import { motion } from 'framer-motion';
 import { TbAdjustments } from 'react-icons/tb';
 
@@ -56,6 +56,25 @@ export default function ProjectMetrics(props) {
     }
   };
 
+  const getData = (dato) => {
+
+    if(dato.qualityFactors){
+
+      if(dato.qualityFactors.includes('deviationmetrics') || dato.qualityFactors.includes('commitsmanagement') || dato.qualityFactors.includes('unassignedtasks')){ 
+        return categories.RDefault;
+      } 
+      else if(dato.qualityFactors.includes('hours') && dato.qualityFactors.includes('activitydistribution')){
+        return {
+          values: [0, 1],
+          colors: ['rgba(99, 132, 255)'],
+        };
+
+      } else 
+        return categories.Default;
+    }
+};
+
+
   return (
     <div className={styles.container}>
       <motion.div
@@ -103,48 +122,20 @@ export default function ProjectMetrics(props) {
             selectedFiltersStudents.length <= 0 ||
             selectedFiltersStudents.includes(key)
           ) {
+            const metric = dataMetrics[key];
             return (
-              <div>
-                {' '}
-                <>
-                  <hr style={{ width: '500px' }} />
-                  <br />
-                </>
-                <div className={styles.titulo}>
-                  <div className={styles.infoTit}>
-                    {key.replace(/_|#|-|@|<>|^[H]/g, ' ')}{' '}
-                  </div>
-                </div>
-                {dataMetrics[key].map((dato) => (
-                  <>
-                    {dato.description !== '' ? (
-                      <div className={styles.infodesc}>{dato.description} </div>
-                    ) : null}
-                    <div key={dato.id} >
-                      <Speedometer
-                        value={dato.value * 100}
-                        text={dato.name}
-                        data={
-                          dato.qualityFactors &&
-                          (dato.qualityFactors.includes('deviationmetrics') ||
-                            dato.qualityFactors.includes('commitsmanagement') ||
-                            dato.qualityFactors.includes('unassignedtasks'))
-                            ? categories.RDefault
-                            : dato.qualityFactors.includes('hours') &&
-                              dato.qualityFactors.includes(
-                                'activitydistribution'
-                              )
-                            ? {
-                                values: [0, 1],
-                                colors: ['rgba(99, 132, 255)'],
-                              }
-                            : categories.Default
-                        }
-                      />
-                    </div>
-                  </>
+              <>
+                {metric.map((dato) => (
+                  <SpeedometerStyled
+                    key={dato.id}
+                    name={dato.name}
+                    description={dato.description}
+                    value={dato.value}
+                    data={getData(dato)}
+                  />                
+              
                 ))}
-              </div>
+              </>
             );
           }
           return null;
