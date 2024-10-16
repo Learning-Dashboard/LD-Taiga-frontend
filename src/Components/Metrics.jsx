@@ -154,16 +154,16 @@ export default function Metrics(props) {
               <option value="4">Quality Factors</option>
               <option value="1">Project Metrics</option>
               <option value="0">Users Metrics</option>
-              <option value="2">Metrics Evaluation</option>
+              <option value="2">Team Metrics</option> 
             </select>
           </div>
           { activeTab !== 2 ?
             <>
               <div className={styles.buttonHistorical} style={{backgroundColor: isHistorical ? '#FFC380' : ''}} onClick={handleClickHistorical}>
-                <FontAwesomeIcon icon={faCalendar} />
+                <FontAwesomeIcon icon={solidClockRotateLeft} /> 
               </div>
               <div className={styles.buttonHistorical} style={{backgroundColor: !isHistorical ? '#FFC380' : ''}} onClick={handleClickNotHistorical}>
-                <FontAwesomeIcon icon={solidClockRotateLeft} />
+                <FontAwesomeIcon icon={faCalendar} /> 
               </div>
             </>
             :
