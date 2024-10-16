@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 
 import styles from './StrategicMetrics.module.css';
-import Speedometer from '../Charts/Speedometer';
+import SpeedmeterStyled from '../ReusableComponents/SpeedmeterStyled/SpeedometerStyled';
 
 export default function StrategicMetrics(props) {
 
@@ -16,33 +16,29 @@ export default function StrategicMetrics(props) {
     }, [props.strategic]);
 
     return (
-        <div
-            className={styles.speedometers_grid}
-        >
+        <div>
             {Object.keys(dataMetrics).map((key) => {
+
+                const metric = dataMetrics[key];
                 return (
                 <>
-                    <div className={styles.speedometers_container}>
-                        {dataMetrics[key].map((dato) => (
-                            <>
-                                <div key={dato.id} className={styles.speedometers}>
-                                <Speedometer
-                                    value={dato.value.first * 100}
-                                    text={dato.name}
-                                    data={
-                                        {
-                                            values: [0, ...dato.probabilities.map((row) => row.upperThreshold).reverse()],
-                                            colors: dato.probabilities.map((row) => row.color).reverse()
-                                        } 
-                                    }
-                                />
-                                </div>
-                            </>
-                        ))}
-                    </div>
+                    {metric.map((dato) => (
+                        <SpeedmeterStyled
+                            key={dato.id}
+                            name={dato.name}
+                            description={dato.description}
+                            value={dato.value.first}
+                            data={
+                                {
+                                    values: [0, ...dato.probabilities.map((row) => row.upperThreshold).reverse()],
+                                    colors: dato.probabilities.map((row) => row.color).reverse()
+                                } 
+                            }
+                        />
+                    ))}
                 </>
                 );
-            })}{' '}
+            })}
         </div>
     );
 }

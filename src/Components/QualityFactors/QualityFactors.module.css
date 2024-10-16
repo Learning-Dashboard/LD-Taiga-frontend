@@ -1,3 +1,68 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+}
+
+.filter_container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: #525252 1px solid;
+}
+
+.filtername {
+    margin: 0px 10px;
+    width: 30px;
+    align-self: center;
+}
+
+.buttons_container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    border: #525252 1px solid;
+    padding: 5px;
+}
+
+.buttons_active {
+    background-color: #18e0b5;
+
+    border: 1px solid #18e0b5;
+    margin: 5px 5px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.buttons {
+    border: 1px solid #000;
+    background: transparent;
+    margin: 5px 5px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.filterIcon {
+    margin: 0px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+  
+.black {
+    background-color: black;
+    color: white;
+}
+
+
 .speedometers {
     display: flex;
     flex-direction: column;
@@ -15,4 +80,27 @@
     display: flex;
     flex-direction: column;
     margin-top: 10px;
+}
+
+.titulo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 25px;
+}
+
+.infoTit {
+    border: 1px solid #18e0b5;
+    margin: 5px 10px;
+    border-radius: 5px;
+    padding: 5px 10px;
+
+    text-align: center;
+}
+
+.infodesc {
+    margin: 5px 10px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-align: center;
 }
