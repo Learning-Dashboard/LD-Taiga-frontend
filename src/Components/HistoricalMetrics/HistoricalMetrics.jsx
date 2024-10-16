@@ -184,7 +184,7 @@ export default function HistoricalMetrics(props) {
                                             labels: data[key].map((row) => row.date),
                                             datasets: [
                                                 {
-                                                    label: "First dataset",
+                                                    label: "",
                                                     data: getData(data, key),
                                                     fill: true,
                                                     backgroundColor: "rgba(75,192,192,0.2)",
@@ -193,7 +193,7 @@ export default function HistoricalMetrics(props) {
                                             ]
                                         }}
                                     />
-                                    <div>{key}</div>
+                                    <div>{data[key][0].name}</div>
                                 </div>
                             )}
                         </div>

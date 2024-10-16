@@ -120,7 +120,7 @@ export default function ProjectMetrics(props) {
                     {dato.description !== '' ? (
                       <div className={styles.infodesc}>{dato.description} </div>
                     ) : null}
-                    <div key={dato.id} className={styles.speedometers}>
+                    <div key={dato.id} >
                       <Speedometer
                         value={dato.value * 100}
                         text={dato.name}
