@@ -22,7 +22,7 @@ function Speedometer(props) {
       />
       <div>
         {props.text && props.value !== undefined
-            ? props.text + ' ( ' + props.value.toString().slice(0, 4) + ' %)'
+            ? ' ( ' + props.value.toString().slice(0, 4) + ' %)'
             : 'Undefined'}
       </div>
     </div>

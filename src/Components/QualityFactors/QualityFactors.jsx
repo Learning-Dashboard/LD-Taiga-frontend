@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import styles from './QualityFactors.module.css';
-import Speedometer from '../Charts/Speedometer';
+import SpeedometerStyled from '../ReusableComponents/SpeedmeterStyled/SpeedometerStyled';
 import { motion } from 'framer-motion';
 import { TbAdjustments } from 'react-icons/tb';
 
@@ -110,40 +110,21 @@ export default function QualityFactors(props) {
                     )}
                 </div>
                 )}
-            <div styles={{ display: 'flex', justifyContent: 'center',}}>
                 {Object.keys(dataMetrics).map((key) => {
 
                     const metric = dataMetrics[key];
 
                     if (!isSelected(key)) return null;
                     return (
-                        <div key={key} >
-                            <div>
-                                {' '}
-                                <>
-                                    <hr style={{ width: '500px' }} />
-                                    <br />
-                                </>
-                                <div className={styles.titulo}>
-                                    <div className={styles.infoTit}>
-                                        {metric.name}{' '}
-                                    </div>
-                                </div>
-                                {metric.description !== '' ? (
-                                <div className={styles.infodesc}>{metric.description} </div>
-                                ) : null}                          
-                                <div className={styles.speedometers}>
-                                    <Speedometer
-                                        value={metric.value.first * 100}
-                                        text={metric.name}
-                                        data={getData(metric.id)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        <SpeedometerStyled
+                            key={key}
+                            name={metric.name}
+                            description={metric.description}
+                            value={metric.value.first}
+                            data={getData(key)}
+                        />
                     );
                 })}
-            </div>
         </div>
     );
 }

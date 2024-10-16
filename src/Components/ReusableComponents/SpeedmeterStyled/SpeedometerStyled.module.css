@@ -1,0 +1,29 @@
+.titulo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px;
+}
+
+.infoTit {
+    border: 1px solid #18e0b5;
+    margin: 5px 10px;
+    border-radius: 5px;
+    padding: 5px 10px;
+
+    text-align: center;
+}
+
+.infodesc {
+    margin: 5px 10px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.speedometers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
