@@ -8,15 +8,15 @@ import { useState, useEffect, useRef } from 'react';
 export default function HistoricalMetrics(props) {
 
     const today = new Date();
-    const oneMonthLater = new Date();
-    oneMonthLater.setFullYear(oneMonthLater.getFullYear() -1);
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(oneYearLater.getFullYear() -1);
 
-    const [fromDate, setFromDate] = useState(oneMonthLater.toISOString().split('T')[0]);
+    const [fromDate, setFromDate] = useState(oneYearLater.toISOString().split('T')[0]);
 
     const [toDate, setToDate] = useState(today.toISOString().split('T')[0]); // Initialize to current date in YYYY-MM-DD format
 
-    const [data, setData] = useState([]);
-    const [originalData, setOriginalData] = useState([]);
+    const [data, setData] = useState({});
+    const [originalData, setOriginalData] = useState({});
     const [isOpen, setIsOpen] = useState(false);         
 
     const [selectedFiltersKeys, setSelectedFiltersKeys] = useState([]);
@@ -54,27 +54,32 @@ export default function HistoricalMetrics(props) {
     
     const handleStartDateChange = (e) => {
         setFromDate(e.target.value);
-        filterDates();
     };
 
     
     const handleEndDateChange = (e) => {
         setToDate(e.target.value);
-        filterDates();
     }
 
-    function filterDates() {
-        const filteredData = {};
-    
-        Object.keys(data).forEach(key => {
-            filteredData[key] = data[key].filter(item => {
-                const itemDate = new Date(item.date);
-                return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
+    useEffect(() => {
+        // Función para filtrar los datos cuando cambian fromDate o toDate
+        function filterDates() {
+            if (!originalData) return;
+
+            const filteredData = {};
+
+            Object.keys(originalData).forEach(key => {
+                filteredData[key] = originalData[key].filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
+                });
             });
-        });
-    
-        setData(filteredData);
-    };
+
+            setData(filteredData);
+        }
+
+        filterDates();
+    }, [fromDate, toDate, originalData]);
 
     function handleFilterButtonClick(key) {
         let updateSelectedFiltersKeys = [...selectedFiltersKeys];
