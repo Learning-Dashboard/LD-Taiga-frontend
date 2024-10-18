@@ -22,6 +22,7 @@ const env = cleanEnv(process.env, {
   PORT: port(), 
   NPM_PACKAGE_DESCRIPTION: str(),
   NPM_PACKAGE_VERSION: str(),
+  HOST: str(),
 });
 
 module.exports = env;
