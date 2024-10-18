@@ -5,6 +5,8 @@ import Qrapids from '../assets/img/qrapids.png';
 import ReactLoading from 'react-loading';
 import CryptoJS from 'crypto-js';
 
+const host = process.env.HOST
+
 const Login = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -34,7 +36,7 @@ const Login = () => {
     // Aquí llamarías a tu backend para autenticar al usuario
     // Si el usuario es autenticado con éxito, establecerías isLoggedIn a true
     try {
-      const response = await fetch('https://gessi-dashboard.essi.upc.edu/api/login/', {
+      const response = await fetch(host + 'api/login/', {
         method: 'POST',
         body: JSON.stringify({ username, password }),
         headers: {

@@ -1,7 +1,8 @@
+const env = require('./utils/config');
+
 var webpack = require('webpack'),
   path = require('path'),
   fileSystem = require('fs-extra'),
-  env = require('./utils/env'),
   CopyWebpackPlugin = require('copy-webpack-plugin'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   TerserPlugin = require('terser-webpack-plugin');
@@ -9,12 +10,12 @@ var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 var ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 var ReactRefreshTypeScript = require('react-refresh-typescript');
 
-const ASSET_PATH = process.env.ASSET_PATH || '/';
+const ASSET_PATH = env.ASSET_PATH || '/';
 
 var alias = {};
 
 // load the secrets
-var secretsPath = path.join(__dirname, 'secrets.' + env.NODE_ENV + '.js');
+const secretsPath = path.join(__dirname, `secrets.${env.NODE_ENV}.js`);
 
 var fileExtensions = [
   'jpg',
@@ -33,10 +34,10 @@ if (fileSystem.existsSync(secretsPath)) {
   alias['secrets'] = secretsPath;
 }
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = env.NODE_ENV !== 'production';
 
 var options = {
-  mode: process.env.NODE_ENV || "development",
+  mode: env.NODE_ENV || "development",
   entry: {
     newtab: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.jsx'),
     options: path.join(__dirname, 'src', 'pages', 'Options', 'index.jsx'),
@@ -138,7 +139,7 @@ var options = {
     new CleanWebpackPlugin({ verbose: false }),
     new webpack.ProgressPlugin(),
     // expose and write the allowed env vars on the compiled bundle
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'HOST']),
     new CopyWebpackPlugin({
       patterns: [
         {
@@ -149,8 +150,8 @@ var options = {
             // generates the manifest file using the package.json informations
             return Buffer.from(
               JSON.stringify({
-                description: process.env.npm_package_description,
-                version: process.env.npm_package_version,
+                description: env.NPM_PACKAGE_DESCRIPTION,
+                version: env.NPM_PACKAGE_VERSION,
                 ...JSON.parse(content.toString()),
               })
             );

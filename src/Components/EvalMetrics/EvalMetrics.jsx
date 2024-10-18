@@ -4,6 +4,8 @@ import RadarChart from '../Charts/Radar';
 import PieChart from '../Charts/PieChart';
 import { Typewriter } from 'react-simple-typewriter';
 
+const host = process.env.HOST;
+
 const colors = [
   'rgba(255, 99, 132, 0.4)',
   'rgba(255, 99, 255, 0.4)',
@@ -122,7 +124,7 @@ const EvalMetrics = (props) => {
   const handleClick = () => {
     setLoading(true);
     fetch(
-      `https://gessi-dashboard.essi.upc.edu/api/projects/${proj}/evaluate/projectmetrics`
+      host + 'api/projects/${proj}/evaluate/projectmetrics'
     )
       .then((response) => response.json())
       .then((data) => {

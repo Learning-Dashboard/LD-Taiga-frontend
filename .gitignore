@@ -22,7 +22,10 @@
 
 # secrets
 secrets.*.js
-
+.env
+.env.development
+.env.production
 
 
 *.zip
+
