@@ -18,6 +18,7 @@ dotenv.config({
 // Validate the environment variables
 const env = cleanEnv(process.env, {
   NODE_ENV: str({ choices: ['development', 'production'] }),
+  BABEL_ENV: str({ choices: ['development', 'production'] }),
   ASSET_PATH: str(),
   PORT: port(), 
   NPM_PACKAGE_DESCRIPTION: str(),
