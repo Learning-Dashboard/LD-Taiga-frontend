@@ -14,8 +14,6 @@ import StrategicMetrics from './StrategicMetrics/StrategicMetrics.jsx';
 import QuaityFactors from './QualityFactors/QualityFactors.jsx';
 import HistoricalMetrics from './HistoricalMetrics/HistoricalMetrics.jsx';
 
-
-
 function reload() {
   chrome.runtime.sendMessage({
     type: 'reloadpage',
@@ -37,8 +35,7 @@ export default function Metrics(props) {
   const [lastreport, setLastreport] = useState(null);
   const [report, setReport] = useState(null);
 
-  //http://localhost:3000/ 
-  const host = 'https://gessi-dashboard.essi.upc.edu/'; //this is the production host
+  const host = process.env.HOST;  //this is the production host
 
   useEffect(() => {
     chrome.storage.local.get('extensionTabs', (data) => {
