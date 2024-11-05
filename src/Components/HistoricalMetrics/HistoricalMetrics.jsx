@@ -8,10 +8,10 @@ import { useState, useEffect, useRef } from 'react';
 export default function HistoricalMetrics(props) {
 
     const today = new Date();
-    const oneYearLater = new Date();
-    oneYearLater.setFullYear(oneYearLater.getFullYear() -1);
+    const oneYearEarlier = new Date();
+    oneYearEarlier.setFullYear(oneYearEarlier.getFullYear() -1);
 
-    const [fromDate, setFromDate] = useState(oneYearLater.toISOString().split('T')[0]);
+    const [fromDate, setFromDate] = useState(oneYearEarlier.toISOString().split('T')[0]);
 
     const [toDate, setToDate] = useState(today.toISOString().split('T')[0]); // Initialize to current date in YYYY-MM-DD format
 
@@ -25,44 +25,95 @@ export default function HistoricalMetrics(props) {
 
     const [filters, setFilters] = useState([]);
 
-    useEffect(() => {
-        if (props.data) { 
-            const result = props.data.reduce((acc, current) => {
-                const id = current.id === null ? "id" : current.id;
-                const updatedCurrent = { ...current, id };  // Update the object
-                if (!acc[id]) {
-                  acc[id] = [];
+    const getHistoricalData = (storageKey) => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: 'getHistoricalFilters', key: storageKey }, (response) => {
+                if (chrome.runtime.lastError) {
+                    return reject(chrome.runtime.lastError);
                 }
-                acc[id].push(updatedCurrent);
-                return acc;
-            }, {}); 
-            
-            setData(result);
-            setOriginalData(result);
+                if (response.error) {
+                    return reject(response.error);
+                }
+                resolve(response.data);
+            });
+        });
+    };
 
-            if (props.type){
-                if(props.type === 3) setShowFilter(false);
-                else {
+    const setHistoricalData = (storageKey, data) => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: 'setHistoricalFilters', key: storageKey, data }, (response) => {
+                if (chrome.runtime.lastError) {
+                    return reject(chrome.runtime.lastError);
+                }
+                if (response.error) {
+                    return reject(response.error);
+                }
+                resolve(response.status);
+            });
+        });
+    };
+
+    useEffect(() => {
+
+        const initialize = async () => {
+            if (props.data) { 
+                const result = props.data.reduce((acc, current) => {
+                    const id = current.id === null ? "id" : current.id;
+                    const updatedCurrent = { ...current, id };  
+                    if (!acc[id]) {
+                    acc[id] = [];
+                    }
+                    acc[id].push(updatedCurrent);
+                    return acc;
+                }, {}); 
+
+                // Invertir cada array de datos para que estén en orden cronológico correcto
+                Object.keys(result).forEach(key => {
+                    result[key] = [...result[key]].reverse(); // Crear una copia y luego invertir
+                });
+                
+                setData(result);
+                setOriginalData(result);
+
+                if (props.type !== undefined && props.type !== null){
+                    if(props.type === 3) {
+                        setShowFilter(false);
+                    } else {
+                        const dynamicFilters = Object.keys(result);
+                        setFilters(dynamicFilters);
+
+                        try {
+                            const storageKey = `historicalMetrics_type_${props.type}`;
+                            const storedData = await getHistoricalData(storageKey);
+                            
+                            if (storedData) {
+                                const { selectedFilters, storedFromDate, storedToDate } = storedData;
+                                setSelectedFiltersKeys(selectedFilters || []);
+                                setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
+                                setToDate(storedToDate || today.toISOString().split('T')[0]);
+                            } else {
+                                setSelectedFiltersKeys([]);
+                                setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                                setToDate(today.toISOString().split('T')[0]);
+                            }
+                        } catch (error) {
+                            console.error('Error al obtener historicalMetrics:', error);
+                            setSelectedFiltersKeys([]);
+                            setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                            setToDate(today.toISOString().split('T')[0]);
+                        }
+                    }
+                } else {
                     const dynamicFilters = Object.keys(result);
                     setFilters(dynamicFilters);
                 }
             }
-        } 
+        }; 
 
-    }, [props.data]);
-
-    
-    const handleStartDateChange = (e) => {
-        setFromDate(e.target.value);
-    };
-
-    
-    const handleEndDateChange = (e) => {
-        setToDate(e.target.value);
-    }
+        initialize();
+    }, [props.data, props.type]);
 
     useEffect(() => {
-        // Función para filtrar los datos cuando cambian fromDate o toDate
         function filterDates() {
             if (!originalData) return;
 
@@ -80,8 +131,37 @@ export default function HistoricalMetrics(props) {
 
         filterDates();
     }, [fromDate, toDate, originalData]);
+    
+    const handleStartDateChange = async (e) => {
+        const newFromDate = e.target.value; 
+        setFromDate(newFromDate);
+        try {
+            await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                selectedFilters: selectedFiltersKeys,
+                storedFromDate: newFromDate, 
+                storedToDate: toDate
+            });
+        } catch (error) {
+            console.error('Error al guardar fechas:', error);
+        }
+    };
+    
+    const handleEndDateChange = async (e) => {
+        const newToDate = e.target.value; 
+        setToDate(newToDate);
+        try {
+            await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                selectedFilters: selectedFiltersKeys,
+                storedFromDate: fromDate,
+                storedToDate: newToDate 
+            });
+        } catch (error) {
+            console.error('Error al guardar fechas:', error);
+        }
+    };
 
-    function handleFilterButtonClick(key) {
+
+    async function handleFilterButtonClick(key) {
         let updateSelectedFiltersKeys = [...selectedFiltersKeys];
         
         if (updateSelectedFiltersKeys.includes(key)) 
@@ -90,20 +170,24 @@ export default function HistoricalMetrics(props) {
             updateSelectedFiltersKeys.push(key);
 
         setSelectedFiltersKeys(updateSelectedFiltersKeys);
+
+        try {
+            await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                selectedFilters: updateSelectedFiltersKeys,
+                storedFromDate: fromDate,
+                storedToDate: toDate
+            });
+        } catch (error) {
+            console.error('Error al guardar historicalFilters:', error);
+        }
     }
 
     function getData(data, key) {
         return data[key].map((row) => {
-            console.log("row.value.first: ", row.value.first);
-            console.log("row.value: ", row.value);
 
-            if (row.value.first === undefined) {
-                console.log("row.value: ", row.value);
-                return row.value.toFixed(2);
-            } else {
-                console.log("row.value.first: ", row.value.first);
-                return row.value.first.toFixed(2);
-            }
+            if (row.value.first === undefined) return row.value.toFixed(2);
+            else return row.value.first.toFixed(2);
+            
         })
     }
 
@@ -163,7 +247,7 @@ export default function HistoricalMetrics(props) {
                                         : styles.buttons
                                     }
                                     >
-                                    {data[key][0].name}
+                                    {data[key][0]?.name || key}
                                 </button>
                             ))}
                         </div>
