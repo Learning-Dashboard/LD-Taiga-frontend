@@ -99,6 +99,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
+  if (request.type === 'getUserFilters') {
+    chrome.storage.local.get(request.key, (result) => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ data: result[request.key] || [] });
+    });
+    return true;
+  }
+
+  if (request.type === 'setUserFilters') {
+    chrome.storage.local.set({ [request.key]: request.data }, () => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ status: 'success' });
+    });
+    return true;
+  }
+
   if (request.type === 'getHistoricalFilters') {
     chrome.storage.local.get(request.key, (result) => {
       if (chrome.runtime.lastError) {
@@ -126,6 +146,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       'projectFilters',
       'usersFiltersStudent',
       'usersFilters',
+      'usersFiltersStudent',
       'extensionTabs'
     ], () => {
       console.log('Filtros y configuraciones principales eliminados.');

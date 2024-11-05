@@ -166,13 +166,14 @@ export default function QualityFactors(props) {
 
                     if (!isSelected(key)) return null;
                     return (
-                        <SpeedometerStyled
-                            key={key}
-                            name={metric.name}
-                            description={metric.description}
-                            value={metric.value.first}
-                            data={getData(key)}
-                        />
+                        <div key={key}>
+                            <SpeedometerStyled
+                                name={metric.name}
+                                description={metric.description}
+                                value={metric.value.first}
+                                data={getData(key)}
+                            />
+                        </div>
                     );
                 })}
         </div>

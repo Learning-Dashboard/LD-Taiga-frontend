@@ -71,42 +71,48 @@ export default function HistoricalMetrics(props) {
                 setData(result);
                 setOriginalData(result);
 
-                if (props.type !== undefined && props.type !== null){
-                    if(props.type === 3) {
-                        setShowFilter(false);
-                    } else {
+                const { type } = props;
+
+                if (type != null) { 
+                    setShowFilter(type !== 3);
+
+                    if (type !== 3) {
                         const dynamicFilters = Object.keys(result);
                         setFilters(dynamicFilters);
+                    }
 
-                        try {
-                            const storageKey = `historicalMetrics_type_${props.type}`;
-                            const storedData = await getHistoricalData(storageKey);
-                            
-                            if (storedData) {
-                                const { selectedFilters, storedFromDate, storedToDate } = storedData;
-                                setSelectedFiltersKeys(selectedFilters || []);
-                                setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
-                                setToDate(storedToDate || today.toISOString().split('T')[0]);
-                            } else {
+                    try {
+                        const storageKey = `historicalMetrics_type_${type}`;
+                        const storedData = await getHistoricalData(storageKey);
+
+                        if (storedData) {
+                            const { selectedFilters, storedFromDate, storedToDate } = storedData;
+
+        
+                            if (type !== 3) setSelectedFiltersKeys(selectedFilters || []);
+                        
+                            setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
+                            setToDate(storedToDate || today.toISOString().split('T')[0]);
+                        } else {
+                            if (type !== 3) {
                                 setSelectedFiltersKeys([]);
-                                setFromDate(oneYearEarlier.toISOString().split('T')[0]);
-                                setToDate(today.toISOString().split('T')[0]);
                             }
-                        } catch (error) {
-                            console.error('Error al obtener historicalMetrics:', error);
-                            setSelectedFiltersKeys([]);
                             setFromDate(oneYearEarlier.toISOString().split('T')[0]);
                             setToDate(today.toISOString().split('T')[0]);
                         }
+                    } catch (error) {
+                        console.error('Error al obtener historicalMetrics:', error);
+                        if (type !== 3) {
+                            setSelectedFiltersKeys([]);
+                        }
+                        setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                        setToDate(today.toISOString().split('T')[0]);
                     }
-
-                    if(props.type === 0){
-                        // Invertir cada array de datos para que estén en orden cronológico correcto
+                    if (type === 0) {
                         Object.keys(result).forEach(key => {
-                            result[key] = [...result[key]].reverse(); // Crear una copia y luego invertir
+                            result[key] = [...result[key]].reverse(); // Crea una copia y luego invierte
                         });
                     }
-                    
                 } else {
                     const dynamicFilters = Object.keys(result);
                     setFilters(dynamicFilters);
