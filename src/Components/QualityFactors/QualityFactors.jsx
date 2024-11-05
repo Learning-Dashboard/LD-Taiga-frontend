@@ -13,25 +13,68 @@ export default function QualityFactors(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [showFilter, setShowFilter] = useState(true);
 
+    const getQualityFilters = () => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: 'getQualityFilters' }, (response) => {
+                if (chrome.runtime.lastError) {
+                    return reject(chrome.runtime.lastError);
+                }
+                if (response.error) {
+                    return reject(response.error);
+                }
+                resolve(response.qualityFilters);
+            });
+        });
+    };
+
+    const setQualityFilters = (filters) => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: 'setQualityFilters', qualityFilters: filters }, (response) => {
+                if (chrome.runtime.lastError) {
+                    return reject(chrome.runtime.lastError);
+                }
+                if (response.error) {
+                    return reject(response.error);
+                }
+                resolve(response.status);
+            });
+        });
+    };
 
     useEffect(() => {
-        if (props.data) {
-            const result = props.data.reduce((acc, current) => {
-                const id = current.id === null ? "id" : current.id;
-                const updatedCurrent = { ...current, id };
-                acc[id] = updatedCurrent; // Almacena el objeto directamente
-                return acc;
-            }, {}); 
 
-            setDataMetrics(result);
+        const initialize = async () => {
+            if (props.data) {
+                const result = props.data.reduce((acc, current) => {
+                    const id = current.id === null ? "id" : current.id;
+                    const updatedCurrent = { ...current, id };
+                    acc[id] = updatedCurrent; // Almacena el objeto directamente
+                    return acc;
+                }, {}); 
 
-            const dynamicFilters = Object.keys(result);
-            setFilters(dynamicFilters);   
-        }
-        
-        if (props.categories) {
-            setCategories(props.categories);
-        }
+                setDataMetrics(result);
+
+                setFilters(Object.keys(result));   
+            }
+            
+            if (props.categories) {
+                setCategories(props.categories);
+            }
+
+            try {
+                const filtersFromStorage = await getQualityFilters();
+                if (filtersFromStorage && Array.isArray(filtersFromStorage)) {
+                    setSelectedFiltersKeys(filtersFromStorage);
+                } else {
+                    setSelectedFiltersKeys([]);
+                }
+            } catch (error) {
+                console.error('Error al obtener qualityFilters:', error);
+                setSelectedFiltersKeys([]);
+            }
+        };
+
+        initialize();
 
     }, [props.data, props.categories]);
 
@@ -57,7 +100,7 @@ export default function QualityFactors(props) {
         }    
     }
 
-    function handleFilterButtonClick(key) {
+    async function handleFilterButtonClick(key) {
         let updateSelectedFiltersKeys = [...selectedFiltersKeys];
         
         if (updateSelectedFiltersKeys.includes(key)) 
@@ -66,6 +109,13 @@ export default function QualityFactors(props) {
             updateSelectedFiltersKeys.push(key);
 
         setSelectedFiltersKeys(updateSelectedFiltersKeys);
+
+        try {
+            await setQualityFilters(updateSelectedFiltersKeys);
+        }
+        catch (error) {
+            console.error('Error al guardar qualityFilters:', error);
+        }
     }
 
     function handleClick() {
@@ -102,7 +152,7 @@ export default function QualityFactors(props) {
                                             : styles.buttons
                                         }
                                         >
-                                        {dataMetrics[key].name}
+                                        {dataMetrics[key]?.name || key}
                                     </button>
                                 ))}
                             </div>

@@ -58,39 +58,88 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
 
-  if (request.type === 'updateprojectFilters') {
-    chrome.storage.local.set({ projectFilters: request.projectFilters }, () => {
-      console.log(
-        'Datos guardados en el almacenamiento local. ' + request.projectFilters
-      );
-    });
-  }
-
-  if (request.type === 'updateusersFiltersStudent') {
-    chrome.storage.local.set(
-      { usersFiltersStudent: request.usersFiltersStudent },
-      () => {
-        console.log(
-          'Datos guardados en el almacenamiento local. ' +
-            request.usersFiltersStudent
-        );
+  if (request.type === 'getProjectFilters') {
+    chrome.storage.local.get('projectFilters', (result) => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
       }
-    );
+      sendResponse({ projectFilters: result.projectFilters || [] });
+    });
+    return true; // Mantener el canal abierto para sendResponse
   }
 
-  if (request.type === 'updateusersFilters') {
-    chrome.storage.local.set({ usersFilters: request.usersFilters }, () => {
-      console.log(
-        'Datos guardados en el almacenamiento local. ' + request.usersFilters
-      );
+  if (request.type === 'getQualityFilters') {
+    chrome.storage.local.get('qualityFilters', (result) => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ qualityFilters: result.qualityFilters || [] });
     });
+    return true;
+  }
+
+
+  if (request.type === 'setProjectFilters') {
+    chrome.storage.local.set({ projectFilters: request.projectFilters }, () => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ status: 'success' });
+    });
+    return true;
+  }
+
+  if (request.type === 'setQualityFilters') {
+    chrome.storage.local.set({ qualityFilters: request.qualityFilters }, () => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ status: 'success' });
+    });
+    return true;
+  }
+
+  if (request.type === 'getHistoricalFilters') {
+    chrome.storage.local.get(request.key, (result) => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ data: result[request.key] });
+    });
+    return true; 
+  }
+
+  if (request.type === 'setHistoricalFilters') {
+    chrome.storage.local.set({ [request.key]: request.data }, () => {
+      if (chrome.runtime.lastError) {
+        return sendResponse({ error: chrome.runtime.lastError });
+      }
+      sendResponse({ status: 'success' });
+    });
+    return true;
   }
 
   if (request.type === 'logout') {
-    chrome.storage.local.remove('projectFilters', () => {});
-    chrome.storage.local.remove('usersFiltersStudent', () => {});
-    chrome.storage.local.remove('usersFilters', () => {});
-    chrome.storage.local.remove('extensionTabs', () => {});
+
+    chrome.storage.local.remove([
+      'qualityFilters',
+      'projectFilters',
+      'usersFiltersStudent',
+      'usersFilters',
+      'extensionTabs'
+    ], () => {
+      console.log('Filtros y configuraciones principales eliminados.');
+    });
+
+    // Eliminación de filtros históricos específicos
+    chrome.storage.local.get(null, (result) => { // Obtener todos los datos
+      const keysToRemove = Object.keys(result).filter(key => key.startsWith('historicalFilters_type_'));
+      if (keysToRemove.length > 0) {
+        chrome.storage.local.remove(keysToRemove, () => {
+          console.log('Filtros históricos eliminados:', keysToRemove);
+        });
+      }
+    });
   }
 
   chrome.storage.local.get('logged_in', (data) => {
