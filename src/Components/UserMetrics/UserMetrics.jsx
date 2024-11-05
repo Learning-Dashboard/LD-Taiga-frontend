@@ -244,7 +244,7 @@ export default function UserMetrics(props) {
                           <Tooltip id={dato.id} place="left" />
                           <div className={styles.infoBut}>{dato.name}</div>
                           Last updated at {dato.date}. Value in % :&nbsp;
-                          {dato.value * 100}
+                          {(dato.value * 100).toFixed(2)}%
                         </div>
                       </>
                     ))}
