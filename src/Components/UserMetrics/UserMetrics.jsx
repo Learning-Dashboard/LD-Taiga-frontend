@@ -1,7 +1,7 @@
 import styles from './UserMetrics.module.css';
 import { useState, useEffect } from 'react';
 import RadarChart from '../Charts/Radar';
-import Speedometer from '../Charts/Speedometer';
+import SpeedometerStyled from '../ReusableComponents/SpeedmeterStyled/SpeedometerStyled';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import { motion } from 'framer-motion';
@@ -34,22 +34,9 @@ const colorBorder = [
 ];
 
 function extractvalues(data) {
-  extractValues(data);
   var result = [];
   data.map((dato) => result.push(dato.value * 100));
   return result;
-}
-
-function extractValues(data) {
-  //Get the max value of the array to do the chart with %
-  let max = 0;
-  data.forEach(element => {
-    if (element.value*100 > max) {
-      max = element*100;
-    }
-  });
-
-  const result = data.map((val) => {return ((val.value*100)/max)*100})
 }
 
 export default function UserMetrics(props) {
@@ -77,99 +64,87 @@ export default function UserMetrics(props) {
     commits: 'Commits',
   };
 
+  const getUserFilters = (filterKey) => {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'getUserFilters', key: filterKey }, (response) => {
+        if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
+        if (response.error) return reject(response.error);
+        resolve(response.data || []);
+      });
+    });
+  };
+
+  const setUserFilters = (filterKey, filters) => {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'setUserFilters', key: filterKey, data: filters }, (response) => {
+        if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
+        if (response.error) return reject(response.error);
+        resolve(response.status);
+      });
+    });
+  };
+
   useEffect(() => {
-    if (props.dataus) {
-      const output = {
-        assignedtasks: [],
-        closedtasks: [],
-        commits: [],
-        modifiedlines: [],
-      };
+    const initialize = async () => {
+      if (props.dataus) setDataMetrics(props.dataus);
+      if (props.categories) setCategories(props.categories);
 
-      for (const name in props.dataus) {
-        if (props.dataus.hasOwnProperty(name)) {
-          props.dataus[name].forEach(item => {
-            const idParts = item.id.split('_');
-            const key = idParts[0];
-            
-            if (output.hasOwnProperty(key)) {
-              output[key].push(item);
-            }
-          });
-        }
+      try {
+        const filtersFromStorage = await getUserFilters('usersFilters');
+        setSelectedFilters(filtersFromStorage);
+
+        const filtersStudentFromStorage = await getUserFilters('usersFiltersStudent');
+        setSelectedFiltersStudents(filtersStudentFromStorage);
+      } catch (error) {
+        console.error('Error al obtener filtros:', error);
       }
+    };
 
-      setDataMetrics(output);
-    }
-
-    if (props.categories) {
-      setCategories(props.categories);
-    }
-
-    chrome.storage.local.get('usersFilters', (data) => {
-      data &&
-      Object.keys(data).length === 0 &&
-      Object.getPrototypeOf(data) === Object.prototype
-        ? setSelectedFilters([])
-        : setSelectedFilters(data.usersFilters);
-    });
-
-    chrome.storage.local.get('usersFiltersStudent', (data) => {
-      data &&
-      Object.keys(data).length === 0 &&
-      Object.getPrototypeOf(data) === Object.prototype
-        ? setSelectedFiltersStudents([])
-        : setSelectedFiltersStudents(data.usersFiltersStudent);
-    });
+    initialize();
   }, [props.dataus, props.categories]);
 
-  const handleFilterButtonClick = (selectedCategory) => {
-    if (selectedFilters.includes(selectedCategory)) {
-      let filters = selectedFilters.filter((el) => el !== selectedCategory);
-      setSelectedFilters(filters);
-      chrome.storage.local.set({ usersFilters: filters }, () => {
-        chrome.runtime.sendMessage({
-          type: 'updateusersFilters',
-          usersFilters: filters,
-        });
-      });
+  const handleFilterButtonClick = async (selectedCategory) => {
+    let updatedFilters = [...selectedFilters];
+    if (updatedFilters.includes(selectedCategory)) {
+      updatedFilters = updatedFilters.filter((el) => el !== selectedCategory);
     } else {
-      setSelectedFilters([...selectedFilters, selectedCategory]);
-      chrome.storage.local.set(
-        { usersFilters: [...selectedFilters, selectedCategory] },
-        () => {
-          chrome.runtime.sendMessage({
-            type: 'updateusersFilters',
-            usersFilters: [...selectedFilters, selectedCategory],
-          });
-        }
-      );
+      updatedFilters.push(selectedCategory);
     }
-  }; 
+    setSelectedFilters(updatedFilters);
 
-  const handleFilterButtonClickStudents = (selectedStudent) => {
-    if (selectedFiltersStudents.includes(selectedStudent)) {
-      let filters2 = selectedFiltersStudents.filter(
-        (el) => el !== selectedStudent
-      );
-      setSelectedFiltersStudents(filters2);
-      chrome.storage.local.set({ usersFiltersStudent: filters2 }, () => {
-        chrome.runtime.sendMessage({
-          type: 'updateusersFiltersStudent',
-          usersFiltersStudent: filters2,
-        });
-      });
+    try {
+      await setUserFilters('usersFilters', updatedFilters);
+    } catch (error) {
+      console.error('Error al guardar usersFilters:', error);
+    }
+  };
+
+  const handleFilterButtonClickStudents = async (selectedStudent) => {
+    let updatedFiltersStudents = [...selectedFiltersStudents];
+    if (updatedFiltersStudents.includes(selectedStudent)) {
+      updatedFiltersStudents = updatedFiltersStudents.filter((el) => el !== selectedStudent);
     } else {
-      setSelectedFiltersStudents([...selectedFiltersStudents, selectedStudent]);
-      chrome.storage.local.set(
-        { usersFiltersStudent: [...selectedFiltersStudents, selectedStudent] },
-        () => {
-          chrome.runtime.sendMessage({
-            type: 'updateusersFiltersStudent',
-            usersFiltersStudent: [...selectedFiltersStudents, selectedStudent],
-          });
-        }
-      );
+      updatedFiltersStudents.push(selectedStudent);
+    }
+    setSelectedFiltersStudents(updatedFiltersStudents);
+
+    try {
+      await setUserFilters('usersFiltersStudent', updatedFiltersStudents);
+    } catch (error) {
+      console.error('Error al guardar usersFiltersStudent:', error);
+    }
+  };
+
+  const getData = (dato) => {
+    if(dato.qualityFactors) {
+      if (dato.qualityFactors.includes('commits') || dato.qualityFactors.includes('modifiedlinescontribution')) {
+        return {
+          values: [0, 1],
+          colors: ['rgba(99, 132, 255)'],
+        };
+      } else {
+        return categories.memberscontribution;
+      }
     }
   };
 
@@ -185,7 +160,7 @@ export default function UserMetrics(props) {
         <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
           <div className={styles.filtername}>Filters</div>
           <div
-            className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`} 
+            className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
           >
             <TbAdjustments size={20} />
           </div>
@@ -208,7 +183,7 @@ export default function UserMetrics(props) {
             </div>
             <motion.div className={styles.buttons_container3}>
               {Object.keys(dataMetrics).map((key) => (
-                <button
+                <button 
                   onClick={() => handleFilterButtonClickStudents(key)}
                   className={
                     selectedFiltersStudents?.includes(key)
@@ -236,9 +211,8 @@ export default function UserMetrics(props) {
               selectedFiltersStudents.includes(key)
             ) {
               return (
-                <>
+                <div key={key}>
                   <hr style={{ width: '500px' }} />
-                  <br />
 
                   <div>
                     {' '}
@@ -276,7 +250,7 @@ export default function UserMetrics(props) {
                     ))}
                   </div>
                   <br />
-                </>
+                </div>
               );
             }
             return null;
@@ -284,7 +258,10 @@ export default function UserMetrics(props) {
         </div>
       ) : (
         <div
-          className={styles.speedometers_container}
+          styles={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
         >
           {Object.keys(dataMetrics).map((key) => {
             if (
@@ -292,46 +269,29 @@ export default function UserMetrics(props) {
               selectedFiltersStudents.includes(key)
             ) {
               return (
-                <>
-                {(selectedFilters.includes(
-                    key.toLowerCase()
-                ) ||
-                  selectedFilters.includes(
-                    dataMetrics[key][0].qualityFactors[0].toLowerCase()
-                  )) && (
-                    <>
-                      <hr style={{ width: '500px' }} />
-                      <br />
-                      <div className={styles.titulo} >
-                        <div className={styles.infoTit}>{key} </div>
+                <div key={key}>
+                  {dataMetrics[key].map((dato) => {
+                    const isSelected =
+                      selectedFilters.includes(
+                        dato.id.toLowerCase().substring(0, dato.id.indexOf('_'))
+                      ) ||
+                      selectedFilters.includes(dato.qualityFactors[0].toLowerCase());
+              
+                    if (isSelected) {
+                      return (
+                        <div key={dato.id}>
+                          <SpeedometerStyled
+                            value={dato.value}
+                            name={dato.name}
+                            data={getData(dato)}
+                          />
                         </div>
-                          <div className={styles.speedometers_grid}>
-                              
-                            {dataMetrics[key].map((dato) => (      
-                              <div key={dato.id} className={styles.speedometers}>
-                                <Speedometer
-                                  value={dato.value * 100}
-                                  text={dato.name}
-                                  data={
-                                    dato.qualityFactors &&
-                                    (dato.qualityFactors.includes('commits') ||
-                                    dato.qualityFactors.includes(
-                                      'modifiedlinescontribution'
-                                    ))
-                                    ? {
-                                      values: [0, 1],
-                                      colors: ['rgba(99, 132, 255)'],
-                                    }
-                                    : categories.memberscontribution
-                                  }
-                                />
-                              </div>                                  
-                            ))}
-                        </div>
-                    </>
-                  )}
-                </>
-              );
+                      );
+                    }
+                    return null; 
+                  })}
+                </div>
+              );              
             }
             return null;
           })}{' '}

@@ -179,13 +179,14 @@ export default function ProjectMetrics(props) {
 
           if (!isSelected(key)) return null;
           return (
+            <div key={key}>
               <SpeedometerStyled
-                  key={key}
                   name={metric.name}
                   description={metric.description}
                   value={metric.value}
                   data={getData(key)}
               />
+            </div>
           );
         })}
       </div>
