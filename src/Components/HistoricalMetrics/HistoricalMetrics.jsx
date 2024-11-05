@@ -67,10 +67,6 @@ export default function HistoricalMetrics(props) {
                     return acc;
                 }, {}); 
 
-                // Invertir cada array de datos para que estén en orden cronológico correcto
-                Object.keys(result).forEach(key => {
-                    result[key] = [...result[key]].reverse(); // Crear una copia y luego invertir
-                });
                 
                 setData(result);
                 setOriginalData(result);
@@ -103,6 +99,14 @@ export default function HistoricalMetrics(props) {
                             setToDate(today.toISOString().split('T')[0]);
                         }
                     }
+
+                    if(props.type === 0){
+                        // Invertir cada array de datos para que estén en orden cronológico correcto
+                        Object.keys(result).forEach(key => {
+                            result[key] = [...result[key]].reverse(); // Crear una copia y luego invertir
+                        });
+                    }
+                    
                 } else {
                     const dynamicFilters = Object.keys(result);
                     setFilters(dynamicFilters);
