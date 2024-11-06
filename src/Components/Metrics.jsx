@@ -11,7 +11,7 @@ import ProjectMetrics from './ProjectMetrics/ProjectMetrics';
 import EvalMetrics from './EvalMetrics/EvalMetrics.jsx';
 import ReactLoading from 'react-loading';
 import StrategicMetrics from './StrategicMetrics/StrategicMetrics.jsx';
-import QuaityFactors from './QualityFactors/QualityFactors.jsx';
+import QualityFactors from './QualityFactors/QualityFactors.jsx';
 import HistoricalMetrics from './HistoricalMetrics/HistoricalMetrics.jsx';
 
 function reload() {
@@ -240,7 +240,7 @@ export default function Metrics(props) {
                 { isHistorical ?
                   (<HistoricalMetrics data={historicalData.qualityFactors} type={activeTab}/>)
                   :
-                  (<QuaityFactors data={factors} categories={categories}/>)
+                  (<QualityFactors data={factors} categories={categories}/>)
                 }
               </div>
             )}

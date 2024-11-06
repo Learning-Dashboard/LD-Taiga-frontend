@@ -11,6 +11,12 @@ const LineChart = (props) => {
                 display: false,
             },
         },
+        scales: {
+            y: {
+                min: 0,
+                max: 1,
+            },
+        },
     }
 
     return <Line data={props.data} options={options}/>;
