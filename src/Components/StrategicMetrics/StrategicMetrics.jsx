@@ -1,7 +1,4 @@
 import { useState, useEffect } from 'react';
-
-
-import styles from './StrategicMetrics.module.css';
 import SpeedmeterStyled from '../ReusableComponents/SpeedmeterStyled/SpeedometerStyled';
 
 export default function StrategicMetrics(props) {
@@ -21,10 +18,9 @@ export default function StrategicMetrics(props) {
 
                 const metric = dataMetrics[key];
                 return (
-                <>
+                <div key={key}>
                     {metric.map((dato) => (
                         <SpeedmeterStyled
-                            key={dato.id}
                             name={dato.name}
                             description={dato.description}
                             value={dato.value.first}
@@ -36,7 +32,7 @@ export default function StrategicMetrics(props) {
                             }
                         />
                     ))}
-                </>
+                </div>
                 );
             })}
         </div>

@@ -5,75 +5,128 @@ import { motion } from 'framer-motion';
 import { TbAdjustments } from 'react-icons/tb';
 
 export default function ProjectMetrics(props) {
-  const [dataMetrics, setDataMetrics] = useState('');
-  const [selectedFiltersStudents, setSelectedFiltersStudents] = useState([]);
-  const [categories, setCategories] = useState('');
+  const [dataMetrics, setDataMetrics] = useState({});
+  const [selectedFiltersKeys, setSelectedFiltersKeys] = useState([]);
+  const [filters, setFilters] = useState([]);
+  const [categories, setCategories] = useState({});
   const [isOpen, setIsOpen] = useState(false);
+
+  const getProjectFilters = () => {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'getProjectFilters' }, (response) => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        if (response.error) {
+          return reject(response.error);
+        }
+        resolve(response.projectFilters);
+      });
+    });
+  };
+
+  const setProjectFilters = (filters) => {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'setProjectFilters', projectFilters: filters }, (response) => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        if (response.error) {
+          return reject(response.error);
+        }
+        resolve(response.status);
+      });
+    });
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+
+      if (props.data) { 
+        const result = Object.keys(props.data).reduce((acc, key) => { //El procesamiento cambia porque props.data es un objeto y no un arreglo
+          if (Array.isArray(props.data[key]) && props.data[key].length > 0) {
+            acc[key] = props.data[key][0]; 
+          }
+          return acc;
+        }, {});
+
+        setDataMetrics(result);
+
+        setFilters(Object.keys(result));
+
+      }
+      if (props.categories) {
+        setCategories(props.categories);
+      }
+      
+      try {
+        const filtersFromStorage = await getProjectFilters();
+        if (filtersFromStorage && Array.isArray(filtersFromStorage)) {
+          setSelectedFiltersKeys(filtersFromStorage);
+        } else {
+          setSelectedFiltersKeys([]);
+        }
+      } catch (error) {
+        console.error('Error al obtener projectFilters:', error);
+        setSelectedFiltersKeys([]);
+      }
+    };
+    
+    initialize();
+  }, [props.data, props.categories]);
+
+  const handleFilterButtonClick = async (key) => {
+    let updateSelectedFiltersKeys = [...selectedFiltersKeys];
+
+    if (updateSelectedFiltersKeys.includes(key)) {
+      updateSelectedFiltersKeys = updateSelectedFiltersKeys.filter((el) => el !== key);
+    } else {
+      updateSelectedFiltersKeys.push(key);
+    }
+
+    setSelectedFiltersKeys(updateSelectedFiltersKeys);
+
+    try {
+      await setProjectFilters(updateSelectedFiltersKeys);
+    } catch (error) {
+      console.error('Error al guardar projectFilters:', error);
+    }
+  };
+
+  const getData = (key) => {
+    if (key) {
+
+      if (
+        key === "commitstasksrelation" ||
+        key === "fulfillmentoftasks" ||
+        key === "taskseffortinformation" ||
+        key === "userstoriesdefinitionquality"
+      ) return categories.Default;
+
+      else if (
+        key === "commitsmanagement" ||
+        key === "deviationmetrics" ||
+        key === "unassignedtasks"
+      ) return categories.RDefault;
+      
+      else if (key === "taskscontribution") {
+        return categories.Deviation;
+      } else {
+        return {
+          values: [0, 1],
+          colors: ['rgba(99, 132, 255)'],
+        };
+      }
+    }
+  };
 
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    if (props.data) {
-      setDataMetrics(props.data);
-    }
-    if (props.categories) {
-      setCategories(props.categories);
-    }
-    chrome.storage.local.get('projectFilters', (data) => {
-      data &&
-      Object.keys(data).length === 0 &&
-      Object.getPrototypeOf(data) === Object.prototype
-        ? setSelectedFiltersStudents([])
-        : setSelectedFiltersStudents(data.projectFilters);
-    });
-  }, [props.data, props.categories]);
-
-  const handleFilterButtonClick = (selectedStudent) => {
-    if (selectedFiltersStudents.includes(selectedStudent)) {
-      let filters2 = selectedFiltersStudents.filter(
-        (el) => el !== selectedStudent
-      );
-      setSelectedFiltersStudents(filters2);
-      chrome.storage.local.set({ projectFilters: filters2 }, () => {
-        chrome.runtime.sendMessage({
-          type: 'updateprojectFilters',
-          projectFilters: filters2,
-        });
-      });
-    } else {
-      setSelectedFiltersStudents([...selectedFiltersStudents, selectedStudent]);
-      chrome.storage.local.set(
-        { projectFilters: [...selectedFiltersStudents, selectedStudent] },
-        () => {
-          chrome.runtime.sendMessage({
-            type: 'updateprojectFilters',
-            projectFilters: [...selectedFiltersStudents, selectedStudent],
-          });
-        }
-      );
-    }
+  const isSelected = (key) => {
+    return selectedFiltersKeys.length === 0 || selectedFiltersKeys.includes(key);
   };
-
-  const getData = (dato) => {
-
-    if(dato.qualityFactors){
-
-      if(dato.qualityFactors.includes('deviationmetrics') || dato.qualityFactors.includes('commitsmanagement') || dato.qualityFactors.includes('unassignedtasks')){ 
-        return categories.RDefault;
-      } 
-      else if(dato.qualityFactors.includes('hours') && dato.qualityFactors.includes('activitydistribution')){
-        return {
-          values: [0, 1],
-          colors: ['rgba(99, 132, 255)'],
-        };
-
-      } else 
-        return categories.Default;
-    }
-};
-
 
   return (
     <div className={styles.container}>
@@ -95,18 +148,21 @@ export default function ProjectMetrics(props) {
         </motion.div>
         {isOpen && (
           <motion.div style={{ marginTop: '10px' }}>
-            {Object.keys(dataMetrics).map((key) => (
-              <button
-                onClick={() => handleFilterButtonClick(key)}
-                className={
-                  selectedFiltersStudents?.includes(key)
-                    ? styles.buttons_active
-                    : styles.buttons
-                }
-              >
-                {key.replace(/_|#|-|@|<>|^[H]/g, ' ')}
-              </button>
-            ))}
+            <div>
+              {filters.map((key) => (
+                <button
+                  key={key}
+                  onClick={() => handleFilterButtonClick(key)}
+                  className={
+                    selectedFiltersKeys.includes(key)
+                      ? styles.buttons_active
+                      : styles.buttons
+                  }
+                >
+                  {dataMetrics[key]?.name || key.replace(/_|#|-|@|<>|^[H]/g, ' ')}
+                </button>
+              ))}
+            </div>
           </motion.div>
         )}
       </motion.div>
@@ -118,27 +174,20 @@ export default function ProjectMetrics(props) {
         }}
       >
         {Object.keys(dataMetrics).map((key) => {
-          if (
-            selectedFiltersStudents.length <= 0 ||
-            selectedFiltersStudents.includes(key)
-          ) {
-            const metric = dataMetrics[key];
-            return (
-              <>
-                {metric.map((dato) => (
-                  <SpeedometerStyled
-                    key={dato.id}
-                    name={dato.name}
-                    description={dato.description}
-                    value={dato.value}
-                    data={getData(dato)}
-                  />                
-              
-                ))}
-              </>
-            );
-          }
-          return null;
+
+          const metric = dataMetrics[key];
+
+          if (!isSelected(key)) return null;
+          return (
+            <div key={key}>
+              <SpeedometerStyled
+                  name={metric.name}
+                  description={metric.description}
+                  value={metric.value}
+                  data={getData(key)}
+              />
+            </div>
+          );
         })}
       </div>
     </div>
