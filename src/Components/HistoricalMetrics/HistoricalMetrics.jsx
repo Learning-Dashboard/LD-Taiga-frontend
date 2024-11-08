@@ -108,11 +108,6 @@ export default function HistoricalMetrics(props) {
                         setFromDate(oneYearEarlier.toISOString().split('T')[0]);
                         setToDate(today.toISOString().split('T')[0]);
                     }
-                    if (type === 0) {
-                        Object.keys(result).forEach(key => {
-                            result[key] = [...result[key]].reverse(); // Crea una copia y luego invierte
-                        });
-                    }
                 } else {
                     const dynamicFilters = Object.keys(result);
                     setFilters(dynamicFilters);
