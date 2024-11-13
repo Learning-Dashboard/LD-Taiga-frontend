@@ -87,4 +87,8 @@
     color: white;
   }
 
-
+.error {
+    color: red;
+    font-size: 20px;
+    margin-top: 15px;
+}
