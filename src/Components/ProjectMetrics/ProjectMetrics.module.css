@@ -1,14 +1,3 @@
-.buttons_active {
-  background-color: #18e0b5;
-  border: 1px solid #18e0b5;
-  margin: 5px 5px;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  width: 216px;
-}
-
 .infoBut {
   background-color: #d1e4e0;
   border: 1px solid #18e0b5;
@@ -42,38 +31,36 @@
   align-items: center;
   font-size: small;
 }
+
+.filter_container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: #525252 1px solid;
+}
+
+.filtername {
+  margin: 0px 10px;
+  width: 30px;
+  align-self: center;
+}
+
 .buttons_container {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-}
-.buttons_container2 {
-  display: flex;
-  position: relative;
-  justify-content: baseline;
-  flex-direction: column;
-  margin-bottom: 40px;
-  margin-left: 25px;
-  margin-right: 25px;
-  max-width: 580px;
-  border: 1px solid #ccc;
-  border-radius: 0px 3px 3px 3px;
+  border: #525252 1px solid;
   padding: 5px;
-  background-color: #ffffffe5;
 }
-.buttons_container2.open {
-  display: flex;
-  position: relative;
-  justify-content: center;
-  flex-direction: column;
-  margin-bottom: 40px;
-  margin-left: 25px;
-  margin-right: 25px;
-  max-width: 580px;
-  border: 1px solid #ccc;
-  border-radius: 0px 3px 3px 3px;
-  padding: 5px;
-  background-color: #ffffffe5;
+
+.buttons_active {
+  background-color: #18e0b5;
+
+  border: 1px solid #18e0b5;
+  margin: 5px 5px;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .buttons {
@@ -84,7 +71,23 @@
   padding: 5px 10px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  width: 216px;
+}
+
+.filterIcon {
+  margin: 0px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.black {
+  background-color: black;
+  color: white;
 }
 
 .speedometers {
@@ -116,25 +119,4 @@
   margin: 25px;
 }
 
-.filtername {
-  margin: 0px 10px;
-  width: 30px;
-  align-self: center;
-}
 
-.filterIcon {
-  margin: 0px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-}
-
-.black {
-  background-color: black;
-  color: white;
-}
