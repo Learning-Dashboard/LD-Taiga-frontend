@@ -51,7 +51,7 @@ export default function Metrics(props) {
       .then((data) => {
         setHistorical(data);
       })
-
+    
     fetch(host+`api/projects/${props.proyecto}/quality_factors`)
       .then((response) => response.json())
       .then((data) => {
