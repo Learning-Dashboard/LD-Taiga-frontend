@@ -53,92 +53,81 @@ export default function HistoricalMetrics(props) {
         });
     };
 
-    useEffect(() => {
+    const initialize = async () => {
+        if (props.data) { 
+            
+            setData(props.data);
+            setOriginalData(props.data);
 
-        const initialize = async () => {
-            if (props.data) { 
-                const result = props.data.reduce((acc, current) => {
-                    const id = current.id === null ? "id" : current.id;
-                    const updatedCurrent = { ...current, id };  
-                    if (!acc[id]) {
-                    acc[id] = [];
-                    }
-                    acc[id].push(updatedCurrent);
-                    return acc;
-                }, {}); 
+            const { type } = props;
 
-                
-                setData(result);
-                setOriginalData(result);
+            setShowFilter(type !== 3);
 
-                const { type } = props;
-
-                if (type != null) { 
-                    setShowFilter(type !== 3);
-
-                    if (type !== 3) {
-                        const dynamicFilters = Object.keys(result);
-                        setFilters(dynamicFilters);
-                    }
-
-                    try {
-                        const storageKey = `historicalMetrics_type_${type}`;
-                        const storedData = await getHistoricalData(storageKey);
-
-                        if (storedData) {
-                            const { selectedFilters, storedFromDate, storedToDate } = storedData;
-
-        
-                            if (type !== 3) setSelectedFiltersKeys(selectedFilters || []);
-                        
-                            setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
-                            setToDate(storedToDate || today.toISOString().split('T')[0]);
-                        } else {
-                            if (type !== 3) {
-                                setSelectedFiltersKeys([]);
-                            }
-                            setFromDate(oneYearEarlier.toISOString().split('T')[0]);
-                            setToDate(today.toISOString().split('T')[0]);
-                        }
-                    } catch (error) {
-                        console.error('Error al obtener historicalMetrics:', error);
-                        if (type !== 3) {
-                            setSelectedFiltersKeys([]);
-                        }
-                        setFromDate(oneYearEarlier.toISOString().split('T')[0]);
-                        setToDate(today.toISOString().split('T')[0]);
-                    }
-                } else {
-                    const dynamicFilters = Object.keys(result);
-                    setFilters(dynamicFilters);
-                }
+            if (type !== 3) {
+                const dynamicFilters = Object.keys(props.data);
+                setFilters(dynamicFilters);
             }
-        }; 
 
+            try {
+                const storageKey = `historicalMetrics_type_${type}`;
+                const storedData = await getHistoricalData(storageKey);
+
+                if (storedData) {
+                    const { selectedFilters, storedFromDate, storedToDate } = storedData;
+
+
+                    if (type !== 3) setSelectedFiltersKeys(selectedFilters || []);
+                
+                    setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
+                    setToDate(storedToDate || today.toISOString().split('T')[0]);
+                } else {
+                    if (type !== 3) {
+                        setSelectedFiltersKeys([]);
+                    }
+                    setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                    setToDate(today.toISOString().split('T')[0]);
+                }
+            } catch (error) {
+                console.error('Error al obtener historicalMetrics:', error);
+                if (type !== 3) {
+                    setSelectedFiltersKeys([]);
+                }
+                setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                setToDate(today.toISOString().split('T')[0]);
+            }
+
+        }
+    };
+
+    useEffect(() => { 
         initialize();
     }, [props.data, props.type]);
 
-    useEffect(() => {
-        function filterDates() {
-            if (!originalData) return;
 
-            const filteredData = {};
+    function filterDates() {
+        if (!originalData) return;
 
-            Object.keys(originalData).forEach(key => {
-                filteredData[key] = originalData[key].filter(item => {
-                    const itemDate = new Date(item.date);
-                    return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
-                });
+        const filteredData = {};
+
+        Object.keys(originalData).forEach(key => {
+            filteredData[key] = originalData[key].filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
             });
+        });
 
-            setData(filteredData);
-        }
+        setData(filteredData);
+    };
 
+    useEffect(() => {
         filterDates();
     }, [fromDate, toDate, originalData]);
     
     const handleStartDateChange = async (e) => {
         const newFromDate = e.target.value; 
+
+        if (newFromDate >= toDate) return;
+
         setFromDate(newFromDate);
         try {
             await setHistoricalData(`historicalMetrics_type_${props.type}`, {
@@ -153,6 +142,9 @@ export default function HistoricalMetrics(props) {
     
     const handleEndDateChange = async (e) => {
         const newToDate = e.target.value; 
+
+        if (newToDate <= fromDate) return;
+
         setToDate(newToDate);
         try {
             await setHistoricalData(`historicalMetrics_type_${props.type}`, {
@@ -252,7 +244,7 @@ export default function HistoricalMetrics(props) {
                                         : styles.buttons
                                     }
                                     >
-                                    {data[key][0]?.name || key}
+                                    {data[key]['0'].name}
                                 </button>
                             ))}
                         </div>
@@ -262,7 +254,7 @@ export default function HistoricalMetrics(props) {
             )}
 
             <div className={styles.charContainer}>
-                {data ? (
+                {data && Object.keys(data).length > 0 ? (
                     Object.keys(data).map((key) => (
                         <div key={key}>
                             {isSelected(key) && (
@@ -281,7 +273,7 @@ export default function HistoricalMetrics(props) {
                                             ]
                                         }}
                                     />
-                                    <div>{data[key][0].name}</div>
+                                    {data[key]['0'].name}
                                 </div>
                             )}
                         </div>
