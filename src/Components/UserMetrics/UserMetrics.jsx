@@ -53,14 +53,14 @@ export default function UserMetrics(props) {
   const filters = [
     'assignedtasks',
     'closedtasks',
-    'modifiedlinescontribution',
+    'modifiedlines',
     'commits',
   ];
 
   const filterNames = {
     assignedtasks: 'Tasks',
     closedtasks: 'Closed tasks',
-    modifiedlinescontribution: 'Modified lines',
+    modifiedlines: 'Modified lines',
     commits: 'Commits',
   };
 
