@@ -160,7 +160,7 @@ export default function HistoricalMetrics(props) {
         const newFromDate = e.target.value; 
 
         if (newFromDate >= toDate) {
-            setDateError("'From' date must be before than 'To' date");
+            setDateError("'From' date must be before than 'To' date.");
             return;
         } else {
             setDateError('');
@@ -192,7 +192,7 @@ export default function HistoricalMetrics(props) {
         const newToDate = e.target.value; 
 
         if (newToDate <= fromDate) {
-            setDateError("'To' date must be later than 'From' date");
+            setDateError("'To' date must be later than 'From' date.");
             return;
         } else {
             setDateError('');
@@ -295,49 +295,52 @@ export default function HistoricalMetrics(props) {
 
     function visualFiltersStudents(){
         return (
-            <div className={styles.filter_container}>
-            <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
-              <div className={styles.filtername}>Filters</div>
-              <div
-                className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
-              >
-                <TbAdjustments size={20} />
-              </div>
-            </motion.div>
-            {isOpen && (
-              <>
-                <div className={styles.buttons_container3}>
-                  {predefinedFilters.map((key) => (
-                    <button
-                      onClick={() => handleFilterButtonClick(key)}
-                      className={
-                        selectedFiltersKeys?.includes(key)
-                          ? styles.buttons_active
-                          : styles.buttons
-                      }
+            <div>
+                <div className={styles.filter_container}>
+                    <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
+                    <div className={styles.filtername}>Filters</div>
+                    <div
+                        className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
                     >
-                      {filterNames[key]}
-                    </button>
-                  ))}
+                        <TbAdjustments size={20} />
+                    </div>
+                    </motion.div>
+                    {isOpen && (
+                    <>
+                        <div className={styles.buttons_container3}>
+                        {predefinedFilters.map((key) => (
+                            <button
+                            onClick={() => handleFilterButtonClick(key)}
+                            className={
+                                selectedFiltersKeys?.includes(key)
+                                ? styles.buttons_active
+                                : styles.buttons
+                            }
+                            >
+                            {filterNames[key]}
+                            </button>
+                        ))}
+                        </div>
+                        <motion.div className={styles.buttons_container3}>
+                        {filterStudents.map((key) => (
+                            console.log(key),
+                            <button 
+                            onClick={() => handleFilterButtonClickStudents(key)}
+                            className={
+                                selectedFiltersStudents?.includes(key)
+                                ? styles.buttons_active
+                                : styles.buttons
+                            }
+                            >
+                            {key}
+                            </button>
+                        ))}
+                        </motion.div>
+                    </>
+                    )}
                 </div>
-                <motion.div className={styles.buttons_container3}>
-                  {filterStudents.map((key) => (
-                    console.log(key),
-                    <button 
-                      onClick={() => handleFilterButtonClickStudents(key)}
-                      className={
-                        selectedFiltersStudents?.includes(key)
-                          ? styles.buttons_active
-                          : styles.buttons
-                      }
-                    >
-                      {key}
-                    </button>
-                  ))}
-                </motion.div>
-              </>
-            )}
-        </div>
+                <div className={styles.message}>{"The selection of users is still in development.\n Don't worry if there is not any data when you select a user.\n This happens because the username of Github is not the same as Taiga."}</div>
+            </div>
         );
     }
 
