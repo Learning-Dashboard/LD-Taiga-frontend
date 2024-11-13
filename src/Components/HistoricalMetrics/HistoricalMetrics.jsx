@@ -25,6 +25,8 @@ export default function HistoricalMetrics(props) {
 
     const [filters, setFilters] = useState([]);
 
+    const [dateError, setDateError] = useState('');  
+
     const getHistoricalData = (storageKey) => {
         return new Promise((resolve, reject) => {
             chrome.runtime.sendMessage({ type: 'getHistoricalFilters', key: storageKey }, (response) => {
@@ -126,7 +128,12 @@ export default function HistoricalMetrics(props) {
     const handleStartDateChange = async (e) => {
         const newFromDate = e.target.value; 
 
-        if (newFromDate >= toDate) return;
+        if (newFromDate >= toDate) {
+            setDateError("'From' date must be before than 'To' date");
+            return;
+        } else {
+            setDateError('');
+        }
 
         setFromDate(newFromDate);
         try {
@@ -143,7 +150,12 @@ export default function HistoricalMetrics(props) {
     const handleEndDateChange = async (e) => {
         const newToDate = e.target.value; 
 
-        if (newToDate <= fromDate) return;
+        if (newToDate <= fromDate) {
+            setDateError("'To' date must be later than 'From' date");
+            return;
+        } else {
+            setDateError('');
+        }
 
         setToDate(newToDate);
         try {
@@ -219,6 +231,8 @@ export default function HistoricalMetrics(props) {
                     />
                 </div>
             </div>
+
+            {dateError && <div className={styles.error}>{dateError}</div>}
 
             {showFilter && (
             <div className={styles.filter_container}>
