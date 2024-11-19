@@ -59,6 +59,17 @@
     padding: 5px;
 }
 
+.buttons_container3 {
+    display: flex;
+    justify-content: space-around;
+    background-color: #18e0b5;
+    margin: 10px 0px 0px;
+    border: #525252 1px solid;
+    border-radius: 3px;
+    background-color: #ffffffe5;
+    flex-wrap: wrap;
+  }
+
 .filtername {
     margin: 0px 10px;
     width: 30px;
@@ -87,4 +98,14 @@
     color: white;
   }
 
+.error {
+    color: red;
+    font-size: 15px;
+    margin-top: 15px;
+}
 
+.message {
+    color: green;
+    font-size: 15px;
+    margin-top: 15px;
+}

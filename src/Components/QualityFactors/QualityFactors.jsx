@@ -11,7 +11,6 @@ export default function QualityFactors(props) {
     const [selectedFiltersKeys, setSelectedFiltersKeys] = useState([]);
     const [filters, setFilters] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [showFilter, setShowFilter] = useState(true);
 
     const getQualityFilters = () => {
         return new Promise((resolve, reject) => {
@@ -128,7 +127,7 @@ export default function QualityFactors(props) {
 
     return (
         <div className={styles.mainContainer}>
-            {showFilter && (
+  
                 <div className={styles.filter_container}>
                     <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
                         <div className={styles.filtername}>Filters</div>
@@ -159,7 +158,7 @@ export default function QualityFactors(props) {
                         </>
                     )}
                 </div>
-                )}
+
                 {Object.keys(dataMetrics).map((key) => {
 
                     const metric = dataMetrics[key];

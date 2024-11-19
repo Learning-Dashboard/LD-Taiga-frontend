@@ -25,6 +25,27 @@ export default function HistoricalMetrics(props) {
 
     const [filters, setFilters] = useState([]);
 
+    const [dateError, setDateError] = useState('');  
+
+    // Estados adicionales para type=0
+    const [selectedFiltersStudents, setSelectedFiltersStudents] = useState([]);
+    const [filterStudents, setFilterStudents] = useState([]);
+
+    // Definición de filtros y nombres para users
+    const predefinedFilters = [
+        'assignedtasks',
+        'closedtasks',
+        'modifiedlines',
+        'commits',
+    ];
+
+    const filterNames = {
+        assignedtasks: 'Tasks',
+        closedtasks: 'Closed tasks',
+        modifiedlines: 'Modified lines',
+        commits: 'Commits',
+    };
+
     const getHistoricalData = (storageKey) => {
         return new Promise((resolve, reject) => {
             chrome.runtime.sendMessage({ type: 'getHistoricalFilters', key: storageKey }, (response) => {
@@ -53,104 +74,115 @@ export default function HistoricalMetrics(props) {
         });
     };
 
-    useEffect(() => {
+    const initialize = async () => {
+        if (props.data) { 
+            
+            setData(props.data);
+            setOriginalData(props.data);
 
-        const initialize = async () => {
-            if (props.data) { 
-                const result = props.data.reduce((acc, current) => {
-                    const id = current.id === null ? "id" : current.id;
-                    const updatedCurrent = { ...current, id };  
-                    if (!acc[id]) {
-                    acc[id] = [];
-                    }
-                    acc[id].push(updatedCurrent);
-                    return acc;
-                }, {}); 
+            const { type } = props;
 
-                
-                setData(result);
-                setOriginalData(result);
+            setShowFilter(type !== 3);
 
-                const { type } = props;
-
-                if (type != null) { 
-                    setShowFilter(type !== 3);
-
-                    if (type !== 3) {
-                        const dynamicFilters = Object.keys(result);
-                        setFilters(dynamicFilters);
-                    }
-
-                    try {
-                        const storageKey = `historicalMetrics_type_${type}`;
-                        const storedData = await getHistoricalData(storageKey);
-
-                        if (storedData) {
-                            const { selectedFilters, storedFromDate, storedToDate } = storedData;
-
-        
-                            if (type !== 3) setSelectedFiltersKeys(selectedFilters || []);
-                        
-                            setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
-                            setToDate(storedToDate || today.toISOString().split('T')[0]);
-                        } else {
-                            if (type !== 3) {
-                                setSelectedFiltersKeys([]);
-                            }
-                            setFromDate(oneYearEarlier.toISOString().split('T')[0]);
-                            setToDate(today.toISOString().split('T')[0]);
-                        }
-                    } catch (error) {
-                        console.error('Error al obtener historicalMetrics:', error);
-                        if (type !== 3) {
-                            setSelectedFiltersKeys([]);
-                        }
-                        setFromDate(oneYearEarlier.toISOString().split('T')[0]);
-                        setToDate(today.toISOString().split('T')[0]);
-                    }
-                    if (type === 0) {
-                        Object.keys(result).forEach(key => {
-                            result[key] = [...result[key]].reverse(); // Crea una copia y luego invierte
-                        });
-                    }
-                } else {
-                    const dynamicFilters = Object.keys(result);
-                    setFilters(dynamicFilters);
-                }
+            if (type !== 3 && type !== 0) {
+                const dynamicFilters = Object.keys(props.data);
+                setFilters(dynamicFilters);
             }
-        }; 
 
+            if (type === 0) {
+                const auxFilterStudents = [...new Set(
+                    Object.keys(props.data).map(key => key.split('_')[1]) //TODO: Recibir los nombres como en UserMetrics sino salen numeros diferentes. Esto revisar en el backend de Taiga
+                )];
+                setFilterStudents(auxFilterStudents);
+            }
+
+            try {
+                const storageKey = `historicalMetrics_type_${type}`;
+                const storedData = await getHistoricalData(storageKey);
+
+                if (storedData) {
+                    
+                    const { selectedStudents, selectedFilters, storedFromDate, storedToDate } = storedData;
+
+                    if (type !== 3) setSelectedFiltersKeys(selectedFilters || []);
+                    if (type === 0) setSelectedFiltersStudents(selectedStudents || []);
+                
+                    setFromDate(storedFromDate || oneYearEarlier.toISOString().split('T')[0]);
+                    setToDate(storedToDate || today.toISOString().split('T')[0]);
+                } else {
+                    if (type !== 3) setSelectedFiltersKeys([]);
+                    if (type === 0) setSelectedFiltersStudents([]);
+
+                    setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                    setToDate(today.toISOString().split('T')[0]);
+                }
+            } catch (error) {
+                console.error('Error al obtener historicalMetrics:', error);
+                if (type !== 3) setSelectedFiltersKeys([]);
+                if (type === 0) setSelectedFiltersStudents([]);
+                
+                setFromDate(oneYearEarlier.toISOString().split('T')[0]);
+                setToDate(today.toISOString().split('T')[0]);
+            }
+
+        }
+    };
+
+    useEffect(() => { 
         initialize();
     }, [props.data, props.type]);
 
-    useEffect(() => {
-        function filterDates() {
-            if (!originalData) return;
 
-            const filteredData = {};
-
-            Object.keys(originalData).forEach(key => {
+    function filterDates() {
+        if (!originalData) return;
+    
+        const filteredData = {};
+    
+        Object.keys(originalData).forEach(key => {
+            if (Array.isArray(originalData[key])) {
                 filteredData[key] = originalData[key].filter(item => {
                     const itemDate = new Date(item.date);
                     return itemDate.getTime() >= new Date(fromDate).getTime() && itemDate.getTime() <= new Date(toDate).getTime();
                 });
-            });
+            } else {
+                filteredData[key] = [];
+            }
+        });
+    
+        setData(filteredData);
+    };
 
-            setData(filteredData);
-        }
-
+    useEffect(() => {
         filterDates();
     }, [fromDate, toDate, originalData]);
     
     const handleStartDateChange = async (e) => {
         const newFromDate = e.target.value; 
+
+        if (newFromDate >= toDate) {
+            setDateError("'From' date must be before than 'To' date.");
+            return;
+        } else {
+            setDateError('');
+        }
+
         setFromDate(newFromDate);
         try {
-            await setHistoricalData(`historicalMetrics_type_${props.type}`, {
-                selectedFilters: selectedFiltersKeys,
-                storedFromDate: newFromDate, 
-                storedToDate: toDate
-            });
+
+            if (props.type !== 0) {
+                await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                    selectedFilters: selectedFiltersKeys,
+                    storedFromDate: newFromDate, 
+                    storedToDate: toDate
+                });
+            } else {
+                await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                    selectedStudents: selectedFiltersStudents,
+                    selectedFilters: selectedFiltersKeys,
+                    storedFromDate: newFromDate, 
+                    storedToDate: toDate
+                });
+            }
         } catch (error) {
             console.error('Error al guardar fechas:', error);
         }
@@ -158,13 +190,30 @@ export default function HistoricalMetrics(props) {
     
     const handleEndDateChange = async (e) => {
         const newToDate = e.target.value; 
+
+        if (newToDate <= fromDate) {
+            setDateError("'To' date must be later than 'From' date.");
+            return;
+        } else {
+            setDateError('');
+        }
+
         setToDate(newToDate);
         try {
-            await setHistoricalData(`historicalMetrics_type_${props.type}`, {
-                selectedFilters: selectedFiltersKeys,
-                storedFromDate: fromDate,
-                storedToDate: newToDate 
-            });
+            if (props.type !== 0) {
+                await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                    selectedFilters: selectedFiltersKeys,
+                    storedFromDate: fromDate, 
+                    storedToDate: newToDate
+                });
+            } else {
+                await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                    selectedStudents: selectedFiltersStudents,
+                    selectedFilters: selectedFiltersKeys,
+                    storedFromDate: fromDate, 
+                    storedToDate: newToDate
+                });
+            }
         } catch (error) {
             console.error('Error al guardar fechas:', error);
         }
@@ -182,8 +231,42 @@ export default function HistoricalMetrics(props) {
         setSelectedFiltersKeys(updateSelectedFiltersKeys);
 
         try {
+
+            if (props.type !== 0) {
+                await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                    selectedFilters: updateSelectedFiltersKeys,
+                    storedFromDate: fromDate,
+                    storedToDate: toDate
+                });
+            } else {
+                await setHistoricalData(`historicalMetrics_type_${props.type}`, {
+                    selectedStudents: selectedFiltersStudents,
+                    selectedFilters: updateSelectedFiltersKeys,
+                    storedFromDate: fromDate,
+                    storedToDate: toDate
+                });
+            }
+        } catch (error) {
+            console.error('Error al guardar historicalFilters:', error);
+        }
+    }
+
+    // Para type=0, se manejan los filtros de estudiantes
+
+    async function handleFilterButtonClickStudents(key) {
+        let updatedFiltersStudents = [...selectedFiltersStudents];
+
+        if (updatedFiltersStudents.includes(key)) 
+            updatedFiltersStudents = updatedFiltersStudents.filter((el) => el !== key);
+        else 
+            updatedFiltersStudents.push(key);
+        
+        setSelectedFiltersStudents(updatedFiltersStudents);
+
+        try {
             await setHistoricalData(`historicalMetrics_type_${props.type}`, {
-                selectedFilters: updateSelectedFiltersKeys,
+                selectedStudents: updatedFiltersStudents,
+                selectedFilters: selectedFiltersKeys,
                 storedFromDate: fromDate,
                 storedToDate: toDate
             });
@@ -191,6 +274,7 @@ export default function HistoricalMetrics(props) {
             console.error('Error al guardar historicalFilters:', error);
         }
     }
+    
 
     function getData(data, key) {
         return data[key].map((row) => {
@@ -207,6 +291,175 @@ export default function HistoricalMetrics(props) {
 
     function isSelected(key) {
         return (selectedFiltersKeys.length === 0 || selectedFiltersKeys.includes(key));
+    }
+
+    function visualFiltersStudents(){
+        return (
+            <div>
+                <div className={styles.filter_container}>
+                    <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
+                    <div className={styles.filtername}>Filters</div>
+                    <div
+                        className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
+                    >
+                        <TbAdjustments size={20} />
+                    </div>
+                    </motion.div>
+                    {isOpen && (
+                    <>
+                        <div className={styles.buttons_container3}>
+                        {predefinedFilters.map((key) => (
+                            <button
+                            onClick={() => handleFilterButtonClick(key)}
+                            className={
+                                selectedFiltersKeys?.includes(key)
+                                ? styles.buttons_active
+                                : styles.buttons
+                            }
+                            >
+                            {filterNames[key]}
+                            </button>
+                        ))}
+                        </div>
+                        <motion.div className={styles.buttons_container3}>
+                        {filterStudents.map((key) => (
+                            console.log(key),
+                            <button 
+                            onClick={() => handleFilterButtonClickStudents(key)}
+                            className={
+                                selectedFiltersStudents?.includes(key)
+                                ? styles.buttons_active
+                                : styles.buttons
+                            }
+                            >
+                            {key}
+                            </button>
+                        ))}
+                        </motion.div>
+                    </>
+                    )}
+                </div>
+                <div className={styles.message}>{"The selection of users is still in development.\n Don't worry if there is not any data when you select a user.\n This happens because the username of Github is not the same as Taiga."}</div>
+            </div>
+        );
+    }
+
+    function visualFiltersNotStudents(){
+        return (
+            <div className={styles.filter_container}>
+                <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
+                    <div className={styles.filtername}>Filters</div>
+                    <div
+                        className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`} 
+                    >
+                        <TbAdjustments size={20} />
+                    </div>
+                </motion.div>
+
+                {isOpen && (
+                    <>
+                        <div>
+                            {filters.map((key) => (
+                                <button
+                                    key={key}
+                                    onClick={() => handleFilterButtonClick(key)}
+                                    className={
+                                        selectedFiltersKeys?.includes(key)
+                                        ? styles.buttons_active
+                                        : styles.buttons
+                                    }
+                                    >
+                                    {data[key]['0'].name}
+                                </button>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    }
+
+    function lineChartStudents(){
+        return (
+            <div className={styles.charContainer}>
+                {data && Object.keys(data).length > 0 ? (
+                    Object.keys(data).map((key) => {
+                        let isSelected = false;
+
+                        if (selectedFiltersKeys.length === 0 && selectedFiltersStudents.length === 0) isSelected = true;
+                        else {
+                            if (selectedFiltersKeys.length > 0 && selectedFiltersStudents.length === 0) 
+                                isSelected = selectedFiltersKeys.includes(key.split('_')[0]);
+                            else if (selectedFiltersKeys.length === 0 && selectedFiltersStudents.length > 0)
+                                isSelected = selectedFiltersStudents.includes(key.split('_')[1]);
+                            else 
+                                isSelected = selectedFiltersKeys.includes(key.split('_')[0]) && selectedFiltersStudents.includes(key.split('_')[1]);
+                        }
+                        
+                      if (isSelected) {
+                        return (
+                            <div key={key}>
+                                <div className={styles.linearChart}>
+                                    <LineChart
+                                        data={{
+                                            labels: data[key].map((row) => row.date),
+                                            datasets: [
+                                                {
+                                                    label: "",
+                                                    data: getData(data, key),
+                                                    fill: true,
+                                                    backgroundColor: "rgba(75,192,192,0.2)",
+                                                    borderColor: "rgba(75,192,192,1)"
+                                                }
+                                            ]
+                                        }}
+                                    />
+                                    {data[key]['0'].name}
+                                </div>
+                            </div>
+                        );
+                        } else return null;
+                    
+                    })
+                ) : (
+                    <p>No data available</p>
+                )}
+            </div>
+        );
+    }
+
+    function lineChartNotStudents(){
+        return (
+            <div className={styles.charContainer}>
+                {data && Object.keys(data).length > 0 ? (
+                    Object.keys(data).map((key) => (
+                        <div key={key}>
+                            {isSelected(key) && (
+                                <div className={styles.linearChart}>
+                                    <LineChart
+                                        data={{
+                                            labels: data[key].map((row) => row.date),
+                                            datasets: [
+                                                {
+                                                    label: "",
+                                                    data: getData(data, key),
+                                                    fill: true,
+                                                    backgroundColor: "rgba(75,192,192,0.2)",
+                                                    borderColor: "rgba(75,192,192,1)"
+                                                }
+                                            ]
+                                        }}
+                                    />
+                                    {data[key]['0'].name}
+                                </div>
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    <p>No data available</p>
+                )}
+            </div>
+        );
     }
 
     return (
@@ -233,68 +486,24 @@ export default function HistoricalMetrics(props) {
                 </div>
             </div>
 
-            {showFilter && (
-            <div className={styles.filter_container}>
-                <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
-                    <div className={styles.filtername}>Filters</div>
-                    <div
-                        className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`} 
-                    >
-                        <TbAdjustments size={20} />
-                    </div>
-                </motion.div>
+            {dateError && <div className={styles.error}>{dateError}</div>}
 
-                {isOpen && (
-                    <>
-                        <div>
-                            {filters.map((key) => (
-                                <button
-                                    key={key}
-                                    onClick={() => handleFilterButtonClick(key)}
-                                    className={
-                                        selectedFiltersKeys?.includes(key)
-                                        ? styles.buttons_active
-                                        : styles.buttons
-                                    }
-                                    >
-                                    {data[key][0]?.name || key}
-                                </button>
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
+            {showFilter &&  props.type !== 0 &&(
+                visualFiltersNotStudents()
             )}
 
-            <div className={styles.charContainer}>
-                {data ? (
-                    Object.keys(data).map((key) => (
-                        <div key={key}>
-                            {isSelected(key) && (
-                                <div className={styles.linearChart}>
-                                    <LineChart
-                                        data={{
-                                            labels: data[key].map((row) => row.date),
-                                            datasets: [
-                                                {
-                                                    label: "",
-                                                    data: getData(data, key),
-                                                    fill: true,
-                                                    backgroundColor: "rgba(75,192,192,0.2)",
-                                                    borderColor: "rgba(75,192,192,1)"
-                                                }
-                                            ]
-                                        }}
-                                    />
-                                    <div>{data[key][0].name}</div>
-                                </div>
-                            )}
-                        </div>
-                    ))
-                ) : (
-                    <p>No data available</p>
-                )}
-            </div>
+            {showFilter && props.type === 0 && (
+                visualFiltersStudents()
+            )}
+            
+            {props.type !== 0 && (
+                lineChartNotStudents()
+            )}
+
+            {props.type === 0 && (
+                lineChartStudents()
+            )}
+                
         </div>
     );
 }

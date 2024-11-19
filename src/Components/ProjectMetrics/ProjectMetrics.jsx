@@ -130,42 +130,36 @@ export default function ProjectMetrics(props) {
 
   return (
     <div className={styles.container}>
-      <motion.div
-        className={`${styles['buttons_container2']} ${
-          isOpen ? styles.open : ''
-        }`}
-        transition={{ layout: { duration: 0.2 } }}
-        layout
-      >
-        <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
-          <div className={styles.filtername}>Filters</div>
-          <div
-            className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
-            
-          >
-            <TbAdjustments size={20} />
-          </div>
-        </motion.div>
-        {isOpen && (
-          <motion.div style={{ marginTop: '10px' }}>
-            <div>
-              {filters.map((key) => (
-                <button
-                  key={key}
-                  onClick={() => handleFilterButtonClick(key)}
-                  className={
-                    selectedFiltersKeys.includes(key)
-                      ? styles.buttons_active
-                      : styles.buttons
-                  }
-                >
-                  {dataMetrics[key]?.name || key.replace(/_|#|-|@|<>|^[H]/g, ' ')}
-                </button>
-              ))}
-            </div>
+      <div className={styles.filter_container}>
+          <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
+              <div className={styles.filtername}>Filters</div>
+              <div
+                  className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`} 
+              >
+                  <TbAdjustments size={20} />
+              </div>
           </motion.div>
-        )}
-      </motion.div>
+
+          {isOpen && (
+              <>
+                  <div>
+                      {filters.map((key) => (
+                          <button
+                              key={key}
+                              onClick={() => handleFilterButtonClick(key)}
+                              className={
+                                  selectedFiltersKeys?.includes(key)
+                                  ? styles.buttons_active
+                                  : styles.buttons
+                              }
+                              >
+                              {dataMetrics[key]?.name || key}
+                          </button>
+                      ))}
+                  </div>
+              </>
+          )}
+      </div>
 
       <div
         styles={{

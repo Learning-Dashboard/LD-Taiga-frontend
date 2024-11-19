@@ -53,14 +53,14 @@ export default function UserMetrics(props) {
   const filters = [
     'assignedtasks',
     'closedtasks',
-    'modifiedlinescontribution',
+    'modifiedlines',
     'commits',
   ];
 
   const filterNames = {
     assignedtasks: 'Tasks',
     closedtasks: 'Closed tasks',
-    modifiedlinescontribution: 'Modified lines',
+    modifiedlines: 'Modified lines',
     commits: 'Commits',
   };
 
@@ -150,54 +150,48 @@ export default function UserMetrics(props) {
 
   return (
     <div className={styles.container}>
-      <motion.div
-        className={`${styles['buttons_container2']} ${
-          isOpen ? styles.open : ''
-        }`}
-        transition={{ layout: { duration: 0.2 } }}
-        layout
-      >
-        <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
-          <div className={styles.filtername}>Filters</div>
-          <div
-            className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
-          >
-            <TbAdjustments size={20} />
-          </div>
-        </motion.div>
-        {isOpen && (
-          <>
-            <div className={styles.buttons_container3}>
-              {filters.map((key) => (
-                <button
-                  onClick={() => handleFilterButtonClick(key)}
-                  className={
-                    selectedFilters?.includes(key)
-                      ? styles.buttons_active
-                      : styles.buttons
-                  }
-                >
-                  {filterNames[key]}
-                </button>
-              ))}
+      <div className={styles.filter_container}>
+          <motion.div className={styles.buttons_container} layout="position" onClick={handleClick}>
+            <div className={styles.filtername}>Filters</div>
+            <div
+              className={`${styles.filterIcon} ${isOpen ? styles.black : ''}`}
+            >
+              <TbAdjustments size={20} />
             </div>
-            <motion.div className={styles.buttons_container3}>
-              {Object.keys(dataMetrics).map((key) => (
-                <button 
-                  onClick={() => handleFilterButtonClickStudents(key)}
-                  className={
-                    selectedFiltersStudents?.includes(key)
-                      ? styles.buttons_active
-                      : styles.buttons
-                  }
-                >
-                  {key.replace(/_|#|-|@|<>|^[H]/g, ' ')}
-                </button>
-              ))}
-            </motion.div>
-          </>
-        )}
-      </motion.div>
+          </motion.div>
+          {isOpen && (
+            <>
+              <div className={styles.buttons_container3}>
+                {filters.map((key) => (
+                  <button
+                    onClick={() => handleFilterButtonClick(key)}
+                    className={
+                      selectedFilters?.includes(key)
+                        ? styles.buttons_active
+                        : styles.buttons
+                    }
+                  >
+                    {filterNames[key]}
+                  </button>
+                ))}
+              </div>
+              <motion.div className={styles.buttons_container3}>
+                {Object.keys(dataMetrics).map((key) => (
+                  <button 
+                    onClick={() => handleFilterButtonClickStudents(key)}
+                    className={
+                      selectedFiltersStudents?.includes(key)
+                        ? styles.buttons_active
+                        : styles.buttons
+                    }
+                  >
+                    {key.replace(/_|#|-|@|<>|^[H]/g, ' ')}
+                  </button>
+                ))}
+              </motion.div>
+            </>
+          )}
+      </div>
       {selectedFilters.length <= 0 ? (
         <div
           styles={{
