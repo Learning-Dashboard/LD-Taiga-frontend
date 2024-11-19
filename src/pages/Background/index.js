@@ -140,27 +140,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.type === 'logout') {
-
-    chrome.storage.local.remove([
-      'qualityFilters',
-      'projectFilters',
-      'usersFiltersStudent',
-      'usersFilters',
-      'usersFiltersStudent',
-      'extensionTabs'
-    ], () => {
-      console.log('Filtros y configuraciones principales eliminados.');
-    });
-
-    // Eliminación de filtros históricos específicos
-    chrome.storage.local.get(null, (result) => { // Obtener todos los datos
-      const keysToRemove = Object.keys(result).filter(key => key.startsWith('historicalFilters_type_'));
-      if (keysToRemove.length > 0) {
-        chrome.storage.local.remove(keysToRemove, () => {
-          console.log('Filtros históricos eliminados:', keysToRemove);
-        });
+    chrome.storage.local.clear(() => {
+      if (chrome.runtime.lastError) {
+        console.error('Error al limpiar el almacenamiento:', chrome.runtime.lastError);
+        sendResponse({ status: 'error', message: chrome.runtime.lastError });
+      } else {
+        console.log('Almacenamiento local limpiado correctamente.');
+        sendResponse({ status: 'success' });
       }
     });
+
+    // Retornar true para indicar que sendResponse se llamará de forma asíncrona
+    return true;
+    
   }
 
   chrome.storage.local.get('logged_in', (data) => {

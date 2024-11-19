@@ -42,13 +42,15 @@
   display: flex;
   justify-content: space-between;
   flex-direction: row;
+  border: #525252 1px solid;
+  padding: 5px;
 }
 .buttons_container3 {
   display: flex;
   justify-content: space-around;
   background-color: #18e0b5;
   margin: 10px 0px 0px;
-  border: 1px solid #ccc;
+  border: #525252 1px solid;
   border-radius: 3px;
   background-color: #ffffffe5;
   flex-wrap: wrap;
@@ -125,6 +127,12 @@
   flex-direction: row;
   justify-content: center;
   margin: 25px;
+}
+
+.filter_container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: #525252 1px solid;
 }
 
 .filtername {
