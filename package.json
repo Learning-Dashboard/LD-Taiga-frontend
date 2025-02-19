@@ -1,11 +1,11 @@
 {
-  "name": "LD-metrics-extension",
+  "name": "extension-prueba",
   "version": "5.0.5",
-  "description": "TFG Gerard's extension",
+  "description": "Pruebas Carla",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Learning-Dashboard/LD-metrics-extension"
+    "url": "https://github.com/Learning-Dashboard/extension-prueba"
   },
   "scripts": {
     "build": "dotenv -e .env.production -- node ./utils/build.js",

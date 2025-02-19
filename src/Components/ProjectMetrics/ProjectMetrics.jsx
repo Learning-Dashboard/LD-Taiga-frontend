@@ -100,13 +100,22 @@ export default function ProjectMetrics(props) {
         key === "commitstasksrelation" ||
         key === "fulfillmentoftasks" ||
         key === "taskseffortinformation" ||
-        key === "userstoriesdefinitionquality"
+        key === "userstoriesdefinitionquality" ||
+        key === "acceptance_criteria_check" ||
+        key === "closed_tasks_with_AE" ||
+        key === "pattern_check" ||
+        key === "tasks_with_EE"
       ) return categories.Default;
 
       else if (
         key === "commitsmanagement" ||
         key === "deviationmetrics" ||
-        key === "unassignedtasks"
+        key === "unassignedtasks" ||
+        key === "commits_anonymous" ||
+        key === "commits_sd" ||
+        key === "commits_taskreference" ||
+        key === "deviation_effort_estimation_simple" ||
+        key === "tasks_sd" 
       ) return categories.RDefault;
       
       else if (key === "taskscontribution") {
