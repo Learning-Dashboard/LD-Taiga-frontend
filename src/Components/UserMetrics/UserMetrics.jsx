@@ -277,6 +277,7 @@ export default function UserMetrics(props) {
                           <SpeedometerStyled
                             value={dato.value}
                             name={dato.name}
+                            description={dato.description}
                             data={getData(dato)}
                           />
                         </div>
