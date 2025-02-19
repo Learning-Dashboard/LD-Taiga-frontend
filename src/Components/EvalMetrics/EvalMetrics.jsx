@@ -53,7 +53,9 @@ const EvalMetrics = (props) => {
     if (props.data) {
       var datasetaux = [];
       // eslint-disable-next-line array-callback-return
-      Object.keys(props.data).map((key, index) => {
+      Object.keys(props.data)
+      .filter((key) => !["anonymous", "sd", "taskreference"].includes(key))
+      .map((key, index) => {
         datasetaux.push({
           label: key + ' Metrics',
           data: extractvalues(props.data[key]),

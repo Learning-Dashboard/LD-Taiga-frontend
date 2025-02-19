@@ -91,9 +91,11 @@ export default function UserMetrics(props) {
 
       try {
         const filtersFromStorage = await getUserFilters('usersFilters');
+        console.log('Filtros de categorías recuperados:', filtersFromStorage);
         setSelectedFilters(filtersFromStorage);
 
         const filtersStudentFromStorage = await getUserFilters('usersFiltersStudent');
+        console.log('Filtros de usuarios recuperados:', filtersStudentFromStorage);
         setSelectedFiltersStudents(filtersStudentFromStorage);
       } catch (error) {
         console.error('Error al obtener filtros:', error);
@@ -176,7 +178,9 @@ export default function UserMetrics(props) {
                 ))}
               </div>
               <motion.div className={styles.buttons_container3}>
-                {Object.keys(dataMetrics).map((key) => (
+                {Object.keys(dataMetrics)
+                  .filter((key) => !["anonymous", "sd", "taskreference"].includes(key))
+                  .map((key) => (
                   <button 
                     onClick={() => handleFilterButtonClickStudents(key)}
                     className={
@@ -199,7 +203,9 @@ export default function UserMetrics(props) {
             justifyContent: 'center',
           }}
         >
-          {Object.keys(dataMetrics).map((key, index) => {
+          {Object.keys(dataMetrics)
+          .filter((key) => !["anonymous", "sd", "taskreference"].includes(key))
+          .map((key, index) => {
             if (
               selectedFiltersStudents.length <= 0 ||
               selectedFiltersStudents.includes(key)
