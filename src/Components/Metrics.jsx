@@ -93,7 +93,9 @@ export default function Metrics(props) {
 
     setLoading(true);
     fetch(host+`api/projects/${props.proyecto}/usersmetrics`)
-      .then((response) => response.json())
+      .then((response) => {
+        return response.json();
+      })      
       .then((data) => {
         data.error ? setError(true) : setError(false);
         setLoading(false);
@@ -147,8 +149,8 @@ export default function Metrics(props) {
         <div className={styles.tabList}>
           <div className={styles.tabcont}>
             <select value={activeTab} onChange={handleSelectChange}>
-              <option value="3">Strategic Indicators</option>
-              <option value="4">Quality Factors</option>
+              {/*<option value="3">Strategic Indicators</option>
+              <option value="4">Quality Factors</option>*/}
               <option value="1">Project Metrics</option>
               <option value="0">Users Metrics</option>
               <option value="2">Team Metrics</option> 

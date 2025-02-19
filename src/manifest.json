@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Taiga metrics",
+  "name": "extension-prueba",
   "version": "1.1",
   "description": "A chrome extension that shows metrics from the Learning Dashboard of Qrapids for UPC projects into the Taiga project management tool",
   "options_page": "options.html",
